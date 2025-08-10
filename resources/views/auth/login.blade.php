@@ -86,11 +86,21 @@
                         <!-- /Logo -->
                         <h4 class="mb-1">Login to Dashboard</h4>
                         <p class="mb-6">Silahkan Login Masuk Dashboard !</p>
+                        
+                         <!-- Display error messages -->
+                        @if(session('error'))
+                            <div class="alert alert-danger mb-4" role="alert">
+                                {{ session('error') }}
+                            </div>
+                        @endif
 
-                        <form id="formAuthentication" class="mb-4" action="{{route('')}}" method="POST">
+                        <form id="formAuthentication" class="mb-4" action="{{route('login')}}" method="POST">
+                            @csrf
+
+                            @method('POST')
                             <div class="mb-6 form-control-validation">
                                 <label for="email" class="form-label fw-semibold">Username</label>
-                                <input type="text" class="form-control" id="email" name="email-username"
+                                <input type="text" class="form-control" id="email" name="email"
                                     placeholder="Enter your email or username" autofocus />
                             </div>
                             <div class="mb-6 form-password-toggle form-control-validation">
