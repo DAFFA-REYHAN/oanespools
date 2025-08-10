@@ -20,10 +20,11 @@
             <div class="container-xxl flex-grow-1 container-p-y">
                 <div class="col-xl">
                     <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Jumlah Proyek dan Pelanggan</h5>
+                        <div class="card-header text-center">
+                            <h5 class="mb-0 text-center">Jumlah Proyek dan Pelanggan</h5>
                         </div>
                         <div class="card-body">
+                            <div class="col-md-6 offset-md-3">
                             <!-- Form for creating or updating the record -->
                             <form action="{{ route('dashboard.store') }}" method="POST">
                                 @csrf
@@ -41,7 +42,7 @@
                                 </div>
 
                                 <div class="mb-6">
-                                    <label class="form-label" for="jumlah_pelanggan">+ Jumlah Pelanggan</label>
+                                    <label class="form-label" for="jumlah_pelanggan">Jumlah Pelanggan</label>
                                     <div class="input-group input-group-merge">
                                         <span class="input-group-text">
                                             <i class="icon-base ti tabler-user"></i>
@@ -50,7 +51,7 @@
                                             placeholder="50 +"
                                             value="{{ old('jumlah_pelanggan', $jumlah->jumlah_pelanggan ?? '') }}"
                                             aria-label="50 +" />
-                                        <span class="input-group-text">Pelanggan</span>
+                                        <span class="input-group-text">+ Pelanggan</span>
                                     </div>
                                 </div>
 

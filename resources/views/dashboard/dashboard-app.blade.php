@@ -126,8 +126,8 @@
                             <div data-i18n="Page 2">Layanan</div>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a href="{{ route('layanan') }}" class="menu-link">
+                    <li class="menu-item {{ Route::is('gallery') ? 'active' : '' }}">
+                        <a href="{{ route('gallery') }}" class="menu-link">
                             <i class="menu-icon icon-base fa-solid fa-images"></i>
                             <div data-i18n="Page 2">Galeri</div>
                         </a>

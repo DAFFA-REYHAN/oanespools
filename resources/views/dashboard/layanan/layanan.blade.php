@@ -22,7 +22,7 @@
 
         .loading-spinner {
             width: 40px;
-            
+
             height: 40px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
@@ -162,7 +162,7 @@
 
                     // Simple confirmation dialog
                     Swal.fire({
-                        title: 'Hapus Layanan?',
+                        title: 'Hapus Layanan',
                         text: `Yakin ingin menghapus "${layananName}"?`,
                         icon: 'warning',
                         showCancelButton: true,
