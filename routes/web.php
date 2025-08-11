@@ -10,7 +10,7 @@ use App\Http\Controllers\RatingController;
 
 Route::get('/', function () {
     return view('index');
-});
+})->name('index');
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -19,6 +19,8 @@ Route::get('/login', function () {
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard', [DashboardController::class, 'store'])->name('dashboard.store');
 

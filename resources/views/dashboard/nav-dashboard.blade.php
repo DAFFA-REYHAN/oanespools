@@ -42,9 +42,12 @@
         </div>
 
         <ul class="navbar-nav flex-row align-items-center ms-md-auto">
-            <a class="dropdown-item hover-red" href="javascript:void(0);">
-                <i class="icon-base ti tabler-power icon-md me-3"></i><span>Log Out</span>
-            </a>
+            <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                @csrf
+                <a class="dropdown-item hover-red" href="javascript:void(0);" onclick="this.closest('form').submit();">
+                    <i class="icon-base ti tabler-power icon-md me-3"></i><span>Log Out</span>
+                </a>
+            </form>
         </ul>
     </div>
 </nav>

@@ -32,4 +32,18 @@ class LoginController extends Controller
         // Jika gagal login, kirimkan error
         return redirect()->back()->withInput()->with('error', 'Invalid credentials. Please try again.');
     }
+    public function logout(Request $request)
+{
+    // Logout user
+    Auth::logout();
+
+    // Invalidate the session
+    $request->session()->invalidate();
+
+    // Regenerate the CSRF token
+    $request->session()->regenerateToken();
+
+    // Redirect to the home page or login page
+    return redirect()->route('index')->with('success', 'Anda telah berhasil logout!');
+}
 }

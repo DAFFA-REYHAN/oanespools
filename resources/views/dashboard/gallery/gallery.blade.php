@@ -53,7 +53,7 @@
                                                                 : null;
                                                         @endphp
                                                         @if ($embedUrl)
-                                                            <iframe width="200" height="150" src="{{ $embedUrl }}"
+                                                            <iframe width="250" height="150" src="{{ $embedUrl }}"
                                                                 frameborder="0"
                                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                                 allowfullscreen></iframe>
