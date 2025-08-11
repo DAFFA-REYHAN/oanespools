@@ -1,5 +1,5 @@
 @extends('dashboard.dashboard-app')
-@section('title', 'Edit Layanan')
+@section('title', 'Tambah Artikel')
 
 @section('content')
     <style>
@@ -11,7 +11,7 @@
         .image-upload-wrapper {
             border: 2px dashed #d9dee3;
             border-radius: 0.5rem;
-            padding: 0.5rem 0.5rem;
+            padding: 2rem 1rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.15s ease-in-out;
@@ -83,6 +83,11 @@
             min-height: 300px;
         }
 
+        /* Custom table button icon */
+        .ql-table-better::before {
+            font-size: 16px;
+            font-weight: bold;
+        }
 
         @media (max-width: 576px) {
             .image-upload-wrapper {
@@ -114,38 +119,37 @@
                                 <a href="{{ route('dashboard') }}">Dashboard</a>
                             </li>
                             <li class="breadcrumb-item">
-                                <a href="{{ route('layanan') }}">Layanan</a>
+                                <a href="{{ route('artikel') }}">Artikel</a>
                             </li>
-                            <li class="breadcrumb-item active">Edit Layanan</li>
+                            <li class="breadcrumb-item active">Tambah Artikel</li>
                         </ol>
                     </nav>
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="mb-0 text-center">Edit Layanan</h4>
+                            <h4 class="mb-0 text-center">Tambah Artikel</h4>
                         </div>
                         <div class="card-body">
                             <form class="browser-default-validation col-md-8 offset-md-2" enctype="multipart/form-data"
-                                action="{{ route('layanan.update', $layanan->id) }}" method="POST">
+                                action="{{ route('artikel.store') }}" method="POST">
                                 @csrf
-                                @method('PUT')
+                                @method('post')
 
                                 <div class="mb-4">
-                                    <label class="form-label fw-bolder" for="nama_layanan">Nama Layanan</label>
-                                    <input type="text" class="form-control" id="nama_layanan"
-                                        placeholder="Masukkan Nama Layanan" name="nama_layanan"
-                                        value="{{ old('nama_layanan', $layanan->nama_layanan) }}" required />
+                                    <label class="form-label fw-bolder" for="title">Judul Artikel</label>
+                                    <input type="text" class="form-control" id="title"
+                                        placeholder="Masukkan Judul Artikel" name="title" required />
                                 </div>
 
                                 <!-- Image Upload Section -->
                                 <div class="mb-4">
-                                    <label class="form-label fw-bolder" for="gambar">Gambar</label>
+                                    <label class="form-label fw-bolder" for="gambar">Gambar Artikel</label>
 
-                                    <input type="file" class="form-control" id="gambar" name="gambar"
-                                        accept="image/*" style="display: none;" />
+                                    <input type="file" class="form-control" id="gambar" name="image"
+                                        accept="image/*" style="display: none;" required />
 
                                     <div class="image-upload-wrapper" id="uploadWrapper"
                                         onclick="document.getElementById('gambar').click()">
-                                        <div id="uploadContent" style="{{ $layanan->gambar ? 'display: none;' : '' }}">
+                                        <div id="uploadContent">
                                             <i class="fas fa-cloud-upload-alt upload-icon"></i>
                                             <div class="text-upload">
                                                 <strong>Klik untuk upload gambar</strong><br>
@@ -153,36 +157,32 @@
                                             </div>
                                         </div>
 
-                                        <div id="previewContent" style="{{ $layanan->gambar ? '' : 'display: none;' }}">
+                                        <div id="previewContent" style="display: none;">
                                             <div class="preview-container">
-                                                <img id="previewImg" class="preview-image" alt="Preview"
-                                                    src="{{ $layanan->gambar ? asset('storage/' . $layanan->gambar) : '' }}">
+                                                <img id="previewImg" class="preview-image" alt="Preview">
                                                 <button type="button" class="btn btn-danger btn-remove"
                                                     onclick="removeImage(event)">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </div>
                                             <div class="mt-2">
-                                                <small class="text-muted" id="fileInfo">
-                                                    {{ $layanan->gambar ? 'Gambar saat ini: ' . basename($layanan->gambar) : '' }}
-                                                </small>
+                                                <small class="text-muted" id="fileInfo"></small>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label fw-bolder" for="title">Deskripsi</label>
+                                    <label class="form-label fw-bolder" for="title">Konten Artikel</label>
                                     <!-- Quill Editor Container - Toolbar akan dibuat otomatis -->
                                     <div id="editor"></div>
                                     <!-- Hidden Input for Quill Editor Content -->
-                                    <input type="hidden" name="deskripsi" id="editor-content" />
+                                    <input type="hidden" name="content" id="editor-content" />
                                 </div>
 
                                 <div class="row text-center">
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-primary" id="submitButton">Update</button>
-                                        <a href="{{ route('layanan') }}" class="btn btn-secondary ms-2">Kembali</a>
+                                        <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
                                     </div>
                                 </div>
                             </form>
@@ -202,7 +202,8 @@
 @endsection
 
 @section('css')
- 
+    <link rel="stylesheet" href="../vuexy/assets/vendor/libs/animate-css/animate.css" />
+    <link rel="stylesheet" href="../vuexy/assets/vendor/libs/sweetalert2/sweetalert2.css" />
 
     <!-- Quill Table Better CSS -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
@@ -285,19 +286,12 @@
                                 bindings: QuillTableBetter.keyboardBindings
                             }
                         },
-                        placeholder: 'Tulis deskripsi layanan di sini...'
+                        placeholder: 'Tulis konten artikel di sini...'
                     };
 
                     quill = new Quill('#editor', options);
-                    console.log('Quill with Table Better initialized successfully');
-
-                    // Load existing content into Quill editor
-                    @if ($layanan->deskripsi)
-                        quill.root.innerHTML = `{!! addslashes($layanan->deskripsi) !!}`;
-                    @endif
 
                 } catch (error) {
-                    console.error('Error initializing Quill with Table Better:', error);
 
                     // Fallback: Initialize basic Quill
                     quill = new Quill('#editor', {
@@ -344,15 +338,9 @@
                                 ['clean']
                             ]
                         },
-                        placeholder: 'Tulis deskripsi layanan di sini...'
+                        placeholder: 'Tulis konten artikel di sini...'
                     });
 
-                    // Load existing content for fallback
-                    @if ($layanan->deskripsi)
-                        quill.root.innerHTML = `{!! addslashes($layanan->deskripsi) !!}`;
-                    @endif
-
-                    console.log('Fallback Quill initialized (without table)');
                 }
 
                 // Setup event handlers after initialization
@@ -375,14 +363,12 @@
                 const file = e.target.files[0];
 
                 if (file) {
-                    // Validasi ukuran (5MB)
                     if (file.size > 5 * 1024 * 1024) {
                         alert('Ukuran file terlalu besar! Maksimal 5MB.');
                         this.value = '';
                         return;
                     }
 
-                    // Validasi tipe file
                     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
                     if (!allowedTypes.includes(file.type)) {
                         alert('Tipe file tidak didukung! Gunakan JPG, PNG, atau GIF.');
@@ -390,14 +376,12 @@
                         return;
                     }
 
-                    // Tampilkan preview
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         document.getElementById('previewImg').src = e.target.result;
                         document.getElementById('uploadContent').style.display = 'none';
                         document.getElementById('previewContent').style.display = 'block';
 
-                        // Info file
                         let fileSize = (file.size / 1024).toFixed(1) + ' KB';
                         if (file.size > 1024 * 1024) {
                             fileSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
@@ -416,10 +400,10 @@
 
                 if (quill) {
                     const content = quill.root.innerHTML;
-                    formData.append('deskripsi', content);
+                    formData.append('content', content);
                 }
 
-                fetch("{{ route('layanan.update', $layanan->id) }}", {
+                fetch("{{ route('artikel.store') }}", {
                         method: "POST",
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -432,11 +416,11 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Sukses!',
-                                text: data.message || 'Layanan berhasil diupdate!',
+                                text: data.message || 'Artikel berhasil ditambahkan!',
                                 showConfirmButton: false,
                                 timer: 2000
                             }).then(() => {
-                                window.location.href = "{{ route('layanan') }}";
+                                window.location.href = "{{ route('artikel') }}";
                             });
                         } else {
                             Swal.fire({
@@ -461,17 +445,9 @@
         // Global function for removing image
         function removeImage(event) {
             event.stopPropagation();
-
-            // Reset file input
             document.getElementById('gambar').value = '';
-
-            // Show upload content, hide preview
             document.getElementById('uploadContent').style.display = 'block';
             document.getElementById('previewContent').style.display = 'none';
-
-            // Clear the preview image source
-            document.getElementById('previewImg').src = '';
-            document.getElementById('fileInfo').textContent = '';
         }
     </script>
 @endsection

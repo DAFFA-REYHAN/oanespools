@@ -1,5 +1,5 @@
 @extends('dashboard.dashboard-app')
-@section('title', 'Edit Layanan')
+@section('title', 'Edit Artikel')
 
 @section('content')
     <style>
@@ -114,38 +114,38 @@
                                 <a href="{{ route('dashboard') }}">Dashboard</a>
                             </li>
                             <li class="breadcrumb-item">
-                                <a href="{{ route('layanan') }}">Layanan</a>
+                                <a href="{{ route('artikel') }}">Artikel</a>
                             </li>
-                            <li class="breadcrumb-item active">Edit Layanan</li>
+                            <li class="breadcrumb-item active">Edit Artikel</li>
                         </ol>
                     </nav>
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="mb-0 text-center">Edit Layanan</h4>
+                            <h4 class="mb-0 text-center">Edit Artikel</h4>
                         </div>
                         <div class="card-body">
                             <form class="browser-default-validation col-md-8 offset-md-2" enctype="multipart/form-data"
-                                action="{{ route('layanan.update', $layanan->id) }}" method="POST">
+                                action="{{ route('artikel.update', $artikel->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
 
                                 <div class="mb-4">
-                                    <label class="form-label fw-bolder" for="nama_layanan">Nama Layanan</label>
-                                    <input type="text" class="form-control" id="nama_layanan"
-                                        placeholder="Masukkan Nama Layanan" name="nama_layanan"
-                                        value="{{ old('nama_layanan', $layanan->nama_layanan) }}" required />
+                                    <label class="form-label fw-bolder" for="title">Judul Artikel</label>
+                                    <input type="text" class="form-control" id="title"
+                                        placeholder="Masukkan Judul Artikel" name="title"
+                                        value="{{ old('title', $artikel->title) }}" required />
                                 </div>
 
                                 <!-- Image Upload Section -->
                                 <div class="mb-4">
                                     <label class="form-label fw-bolder" for="gambar">Gambar</label>
 
-                                    <input type="file" class="form-control" id="gambar" name="gambar"
+                                    <input type="file" class="form-control" id="gambar" name="image"
                                         accept="image/*" style="display: none;" />
 
                                     <div class="image-upload-wrapper" id="uploadWrapper"
                                         onclick="document.getElementById('gambar').click()">
-                                        <div id="uploadContent" style="{{ $layanan->gambar ? 'display: none;' : '' }}">
+                                        <div id="uploadContent" style="{{ $artikel->image ? 'display: none;' : '' }}">
                                             <i class="fas fa-cloud-upload-alt upload-icon"></i>
                                             <div class="text-upload">
                                                 <strong>Klik untuk upload gambar</strong><br>
@@ -153,10 +153,10 @@
                                             </div>
                                         </div>
 
-                                        <div id="previewContent" style="{{ $layanan->gambar ? '' : 'display: none;' }}">
+                                        <div id="previewContent" style="{{ $artikel->image ? '' : 'display: none;' }}">
                                             <div class="preview-container">
                                                 <img id="previewImg" class="preview-image" alt="Preview"
-                                                    src="{{ $layanan->gambar ? asset('storage/' . $layanan->gambar) : '' }}">
+                                                    src="{{ $artikel->image ? asset('storage/' . $artikel->image) : '' }}">
                                                 <button type="button" class="btn btn-danger btn-remove"
                                                     onclick="removeImage(event)">
                                                     <i class="fas fa-times"></i>
@@ -164,7 +164,7 @@
                                             </div>
                                             <div class="mt-2">
                                                 <small class="text-muted" id="fileInfo">
-                                                    {{ $layanan->gambar ? 'Gambar saat ini: ' . basename($layanan->gambar) : '' }}
+                                                    {{ $artikel->image ? 'Gambar saat ini: ' . basename($artikel->image) : '' }}
                                                 </small>
                                             </div>
                                         </div>
@@ -182,7 +182,7 @@
                                 <div class="row text-center">
                                     <div class="col-12">
                                         <button type="submit" class="btn btn-primary" id="submitButton">Update</button>
-                                        <a href="{{ route('layanan') }}" class="btn btn-secondary ms-2">Kembali</a>
+                                        <a href="{{ route('artikel') }}" class="btn btn-secondary ms-2">Kembali</a>
                                     </div>
                                 </div>
                             </form>
@@ -202,7 +202,7 @@
 @endsection
 
 @section('css')
- 
+
 
     <!-- Quill Table Better CSS -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
@@ -210,7 +210,7 @@
 @endsection
 
 @section('js')
-    <script src="../vuexy/assets/vendor/libs/sweetalert2/sweetalert2.js"></script>
+   
 
     <!-- Quill Table Better JS -->
     <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
@@ -285,15 +285,15 @@
                                 bindings: QuillTableBetter.keyboardBindings
                             }
                         },
-                        placeholder: 'Tulis deskripsi layanan di sini...'
+                        placeholder: 'Tulis konten artikel di sini...'
                     };
 
                     quill = new Quill('#editor', options);
                     console.log('Quill with Table Better initialized successfully');
 
                     // Load existing content into Quill editor
-                    @if ($layanan->deskripsi)
-                        quill.root.innerHTML = `{!! addslashes($layanan->deskripsi) !!}`;
+                    @if ($artikel->content)
+                        quill.root.innerHTML = `{!! addslashes($artikel->content) !!}`;
                     @endif
 
                 } catch (error) {
@@ -344,12 +344,12 @@
                                 ['clean']
                             ]
                         },
-                        placeholder: 'Tulis deskripsi layanan di sini...'
+                        placeholder: 'Tulis konten artikel di sini...'
                     });
 
                     // Load existing content for fallback
-                    @if ($layanan->deskripsi)
-                        quill.root.innerHTML = `{!! addslashes($layanan->deskripsi) !!}`;
+                    @if ($artikel->content)
+                        quill.root.innerHTML = `{!! addslashes($artikel->content) !!}`;
                     @endif
 
                     console.log('Fallback Quill initialized (without table)');
@@ -416,10 +416,10 @@
 
                 if (quill) {
                     const content = quill.root.innerHTML;
-                    formData.append('deskripsi', content);
+                    formData.append('content', content);
                 }
 
-                fetch("{{ route('layanan.update', $layanan->id) }}", {
+                fetch("{{ route('artikel.update', $artikel->id) }}", {
                         method: "POST",
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -432,11 +432,11 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Sukses!',
-                                text: data.message || 'Layanan berhasil diupdate!',
+                                text: data.message || 'Artikel berhasil diupdate!',
                                 showConfirmButton: false,
                                 timer: 2000
                             }).then(() => {
-                                window.location.href = "{{ route('layanan') }}";
+                                window.location.href = "{{ route('artikel') }}";
                             });
                         } else {
                             Swal.fire({

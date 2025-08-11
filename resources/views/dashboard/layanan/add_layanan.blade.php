@@ -1,5 +1,5 @@
 @extends('dashboard.dashboard-app')
-@section('title', 'Dashboard')
+@section('title', 'Tambah Layanan')
 
 @section('content')
     <style>
@@ -340,7 +340,7 @@
                         },
                         placeholder: 'Tulis deskripsi layanan di sini...'
                     });
-              
+
                 }
 
                 // Setup event handlers after initialization

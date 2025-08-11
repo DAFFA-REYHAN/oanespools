@@ -11,10 +11,12 @@
             <!-- Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
                 <div class="col-xl">
-                    <div class="card">
-                        <div class="card-header">
+                    <div class="card mb-5">
+                        <div class="card-header p-4">
                             <h4 class="mb-0">Galeri</h4>
                         </div>
+                    </div>
+                    <div class="card mb-5">
                         <!-- VIDEO EMBED -->
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Video </h5>
@@ -68,7 +70,8 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button" class="btn btn-danger btn-sm deleteButton"
-                                                            data-id="video-{{ $video->id }}"><i class="icon-base ti tabler-trash me-2"></i> Hapus</button>
+                                                            data-id="video-{{ $video->id }}"><i
+                                                                class="icon-base ti tabler-trash me-2"></i> Hapus</button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -77,7 +80,8 @@
                                 </table>
                             </div>
                         </div>
-                        <hr class="mt-4 mb-2 border-5 ">
+                    </div>
+                    <div class="card">
                         <!-- GAMBAR -->
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Gambar</h5>
@@ -114,7 +118,8 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button" class="btn btn-danger btn-sm deleteButton"
-                                                            data-id="image-{{ $image->id }}"><i class="icon-base ti tabler-trash me-2"></i> Hapus</button>
+                                                            data-id="image-{{ $image->id }}"><i
+                                                                class="icon-base ti tabler-trash me-2"></i> Hapus</button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -123,6 +128,7 @@
                                 </table>
                             </div>
                         </div>
+
 
                     </div>
                 </div>
@@ -228,7 +234,7 @@
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Hapus',
                     cancelButtonText: 'Batal'
                 }).then((result) => {

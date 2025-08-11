@@ -36,7 +36,8 @@
     <link rel="stylesheet" href="{{ asset('vuexy/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
 
     <!-- endbuild -->
-
+        <link rel="stylesheet" href="{{ asset('../vuexy/assets/vendor/libs/animate-css/animate.css') }}" />
+    <link rel="stylesheet" href="{{ asset('../vuexy/assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
     <!-- Page CSS -->
 
     <!-- Helpers -->
@@ -132,14 +133,14 @@
                             <div data-i18n="Page 2">Galeri</div>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a href="{{ route('layanan') }}" class="menu-link">
+                    <li class="menu-item {{ Route::is('artikel') ? 'active' : '' }}">
+                        <a href="{{ route('artikel') }}" class="menu-link">
                             <i class="menu-icon icon-base fa-regular fa-newspaper"></i>
                             <div data-i18n="Page 2">Artikel</div>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a href="{{ route('layanan') }}" class="menu-link">
+                    <li class="menu-item {{ Route::is('rating') ? 'active' : '' }}">
+                        <a href="{{ route('rating') }}" class="menu-link">
                             <i class="menu-icon icon-base fa-regular fa-star"></i>
                             <div data-i18n="Page 2">Penilaian</div>
                         </a>
@@ -195,6 +196,7 @@
     <script src="{{ asset('vuexy/assets/js/main.js') }}"></script>
 
     <!-- Page JS -->
+      <script src="{{ asset('vuexy/assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
 
     @yield('js')
 </body>
