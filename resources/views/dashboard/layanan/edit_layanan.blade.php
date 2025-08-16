@@ -126,8 +126,6 @@
                         <div class="card-body">
                             <form class="browser-default-validation col-md-8 offset-md-2" enctype="multipart/form-data"
                                 action="{{ route('layanan.update', $layanan->id) }}" method="POST">
-                                @csrf
-                                @method('PUT')
 
                                 <div class="mb-4">
                                     <label class="form-label fw-bolder" for="nama_layanan">Nama Layanan</label>
@@ -202,7 +200,7 @@
 @endsection
 
 @section('css')
- 
+
 
     <!-- Quill Table Better CSS -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet" />
@@ -412,7 +410,7 @@
             document.getElementById('submitButton').addEventListener('click', function(event) {
                 event.preventDefault();
 
-                let formData = new FormData(document.querySelector('form'));
+                let formData = new FormData(document.querySelector('form.browser-default-validation'));
 
                 if (quill) {
                     const content = quill.root.innerHTML;

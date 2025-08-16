@@ -40,7 +40,7 @@ class LayananController extends Controller
             // Validate form data
             $validated = $request->validate([
                 'nama_layanan' => 'required|string|max:255', // nama_layanan is required
-                'gambar' => 'nullable|file|mimes:jpeg,jpg,png,gif,pdf|max:5120', // gambar is nullable
+                'gambar' => 'nullable|file|mimes:jpeg,jpg,png|max:5120', // gambar is nullable
                 'deskripsi' => 'nullable|string', // deskripsi is nullable
             ]);
 
@@ -49,18 +49,9 @@ class LayananController extends Controller
             if ($request->hasFile('gambar')) {
                 $file = $request->file('gambar');
 
-                // Validate image file type and size
-                if (!in_array($file->getClientOriginalExtension(), ['jpeg', 'jpg', 'png', 'gif', 'pdf'])) {
-                    return response()->json(['success' => false, 'error' => 'File format not supported. Please upload an image or PDF file.']);
-                }
-
-                if ($file->getSize() > 5120 * 1024) {
-                    // 5MB max size
-                    return response()->json(['success' => false, 'error' => 'File size is too large. Maximum size is 5MB.']);
-                }
-
                 // Generate a custom file name (using nama_layanan and current timestamp)
                 $filename = $request->nama_layanan . '-' . now()->timestamp . '.' . $file->getClientOriginalExtension();
+
                 // Store the file in 'storage/app/public/layanans' folder with the custom name
                 $path = $file->storeAs('Layanan', $filename, 'public');
             }
@@ -73,13 +64,15 @@ class LayananController extends Controller
             ]);
 
             // Return success response as JSON
-            return response()->json(['success' => true, 'message' => 'Layanan Berhasil di tambahkan!']);
+            return response()->json(['success' => true, 'message' => 'Layanan Berhasil di tambahkan!'], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Handle validation errors
-            return response()->json(['success' => false, 'error' => 'Validation failed: ' . implode(', ', $e->errors())]);
+            return response()->json(['success' => false, 'error' => 'Validation failed: ' . implode(', ', $e->errors())], 422);
         } catch (\Exception $e) {
             // Catch general errors (e.g., file upload failure, database issues)
-            return response()->json(['success' => false, 'error' => 'An unexpected error occurred. Please try again later.']);
+            // Log the error message for debugging purposes
+            \Log::error('Error adding layanan: ' . $e->getMessage());
+            return response()->json(['success' => false, 'error' => 'An unexpected error occurred. Please try again later.'], 500);
         }
     }
 

@@ -131,8 +131,7 @@
                         <div class="card-body">
                             <form class="browser-default-validation col-md-8 offset-md-2" enctype="multipart/form-data"
                                 action="{{ route('layanan.store') }}" method="POST">
-                                @csrf
-                                @method('post')
+
 
                                 <div class="mb-4">
                                     <label class="form-label fw-bolder" for="nama_layanan">Nama Layanan</label>
@@ -393,25 +392,101 @@
             });
 
             // Submit button handler
+            // Submit button handler - FIXED VERSION
             document.getElementById('submitButton').addEventListener('click', function(event) {
                 event.preventDefault();
 
-                let formData = new FormData(document.querySelector('form'));
+                // Get the form element specifically
+                const form = document.querySelector('form.browser-default-validation');
 
-                if (quill) {
-                    const content = quill.root.innerHTML;
-                    formData.append('deskripsi', content);
+                if (!form) {
+                    console.error('Form not found');
+                    return;
                 }
 
+                // Create FormData from the form element
+                let formData = new FormData(form);
+
+                // Add CSRF token to FormData (not just headers)
+                formData.append('_token', '{{ csrf_token() }}');
+
+                // Add Quill editor content
+                if (quill) {
+                    const content = quill.root.innerHTML;
+                    // Remove existing deskripsi if any and add the new one
+                    formData.delete('deskripsi');
+                    formData.append('deskripsi', content);
+                    console.log('Quill content added:', content);
+                }
+
+                // Debug: Log all form data
+                console.log('=== FormData Contents ===');
+                for (let pair of formData.entries()) {
+                    if (pair[1] instanceof File) {
+                        console.log(pair[0] + ': [File] ' + pair[1].name + ' (' + pair[1].size + ' bytes)');
+                    } else {
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
+                }
+
+                // Validate required fields before submission
+                const namaLayanan = formData.get('nama_layanan');
+                const gambar = formData.get('gambar');
+                const deskripsi = formData.get('deskripsi');
+
+                if (!namaLayanan || namaLayanan.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        text: 'Nama layanan harus diisi!',
+                    });
+                    return;
+                }
+
+                if (!gambar || gambar.size === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        text: 'Gambar harus dipilih!',
+                    });
+                    return;
+                }
+
+                if (!deskripsi || deskripsi.trim() === '' || deskripsi === '<p><br></p>') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        text: 'Deskripsi harus diisi!',
+                    });
+                    return;
+                }
+
+                // Show loading state
+                Swal.fire({
+                    title: 'Mengirim Data...',
+                    text: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Submit the form
                 fetch("{{ route('layanan.store') }}", {
                         method: "POST",
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         },
-                        body: formData
+                        body: formData // Don't set Content-Type header, let browser set it with boundary
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Response data:', data);
+
                         if (data.success) {
                             Swal.fire({
                                 icon: 'success',
@@ -426,12 +501,14 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Ups...',
-                                text: data.error || 'Terjadi kesalahan. Silakan coba lagi.',
+                                text: data.error || data.message ||
+                                    'Terjadi kesalahan. Silakan coba lagi.',
                                 showConfirmButton: true,
                             });
                         }
                     })
                     .catch(error => {
+                        console.error('Fetch error:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Kesalahan Jaringan',

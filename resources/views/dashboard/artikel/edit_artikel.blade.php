@@ -126,9 +126,6 @@
                         <div class="card-body">
                             <form class="browser-default-validation col-md-8 offset-md-2" enctype="multipart/form-data"
                                 action="{{ route('artikel.update', $artikel->id) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-
                                 <div class="mb-4">
                                     <label class="form-label fw-bolder" for="title">Judul Artikel</label>
                                     <input type="text" class="form-control" id="title"
@@ -210,7 +207,7 @@
 @endsection
 
 @section('js')
-   
+
 
     <!-- Quill Table Better JS -->
     <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>

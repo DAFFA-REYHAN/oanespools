@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LayananController;
@@ -8,9 +9,9 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\RatingController;
 
-Route::get('/', function () {
-    return view('index');
-})->name('index');
+
+Route::get('/', [HomeController::class, 'index']);
+
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -28,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/add-layanan', [LayananController::class, 'add_layanan'])->name('add-layanan');
     Route::post('/layanan/store', [LayananController::class, 'store'])->name('layanan.store');
     Route::get('/layanan/{id}', [LayananController::class, 'edit'])->name('edit-layanan');
-    Route::put('/layanan/{id}', [LayananController::class, 'update'])->name('layanan.update');
+    Route::post('/layanan/{id}', [LayananController::class, 'update'])->name('layanan.update');
     Route::delete('/layanan/{id}', [LayananController::class, 'destroy'])->name('layanan.destroy');
 
     Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery');
