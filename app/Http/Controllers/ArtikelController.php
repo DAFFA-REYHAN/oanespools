@@ -99,11 +99,11 @@ class ArtikelController extends Controller
         // dd($request->all());
         try {
             // Validate form data
-            $validated = $request->validate([
-                'title' => 'required|string|max:255', // title is required 
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                 'content' => 'nullable', // image is nullable
-            ]);
+            // $validated = $request->validate([
+            //     'title' => 'required|string|max:255', // title is required 
+            //     'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            //      'content' => 'nullable', // image is nullable
+            // ]);
 
             $imagePath = null; // Default to null if no image is uploaded
 

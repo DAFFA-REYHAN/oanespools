@@ -573,7 +573,7 @@
 
                                     <!-- Content -->
                                     <div class="prose prose-lg max-w-none mb-8">
-                                        <div x-html="selectedArtikel ? selectedArtikel.content : ''"
+                                        <div x-html='selectedArtikel ? selectedArtikel.content : ""'
                                             class="text-gray-700 leading-relaxed"></div>
                                     </div>
 
