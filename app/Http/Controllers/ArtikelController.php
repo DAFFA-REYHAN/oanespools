@@ -96,12 +96,13 @@ class ArtikelController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         try {
             // Validate form data
             $validated = $request->validate([
-                'title' => 'required|string|max:255', // title is required
-                'content' => 'required|string', // content is required
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // image is nullable
+                'title' => 'required|string|max:255', // title is required 
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                 'content' => 'nullable', // image is nullable
             ]);
 
             $imagePath = null; // Default to null if no image is uploaded
@@ -115,9 +116,9 @@ class ArtikelController extends Controller
                     return response()->json(['success' => false, 'error' => 'File format not supported. Please upload an image file.']);
                 }
 
-                if ($image->getSize() > 2048 * 1024) {
+                if ($image->getSize() > 5048 * 1024) {
                     // 2MB max size
-                    return response()->json(['success' => false, 'error' => 'File size is too large. Maximum size is 2MB.']);
+                    return response()->json(['success' => false, 'error' => 'File size is too large. Maximum size is 5MB.']);
                 }
 
                 // Generate a custom file name (using current timestamp and random string)

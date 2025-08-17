@@ -6,6 +6,46 @@
 
 @push('styles')
     <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .prose h1,
+        .prose h2,
+        .prose h3,
+        .prose h4,
+        .prose h5,
+        .prose h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+        }
+
+        .prose p {
+            margin-bottom: 1em;
+        }
+
+        .prose ul,
+        .prose ol {
+            margin: 1em 0;
+            padding-left: 1.5em;
+        }
+
+        .prose img {
+            margin: 1.5em 0;
+            border-radius: 0.5rem;
+        }
+
         /* Slider Styles */
         .swiper-container {
             position: relative;
@@ -49,6 +89,26 @@
             object-fit: cover;
         }
 
+        .truncate-lines {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            /* Membatasi menjadi 3 baris */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+        }
+
+        .truncate-lines-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            /* Membatasi menjadi 3 baris */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+        }
+    </style>
 
     </style>
 @endpush
@@ -323,8 +383,10 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div class="swiper-button-next  hide-for-small-only hide-for-medium-only"  style="color: gray;"></div>
-                        <div class="swiper-button-prev  hide-for-small-only hide-for-medium-only"  style="color: gray;"></div>
+                        <div class="swiper-button-next  hide-for-small-only hide-for-medium-only" style="color: gray;">
+                        </div>
+                        <div class="swiper-button-prev  hide-for-small-only hide-for-medium-only" style="color: gray;">
+                        </div>
                     </div>
                 </div>
 
@@ -343,8 +405,8 @@
                                 }">
                                 <template x-for="(image, index) in group" :key="index">
                                     <!-- Menggunakan image.src dan image.alt yang benar -->
-                                    <a data-fancybox="images" :href='image.src' :data-sources='image.src' :data-caption="image.alt"
-                                        class="cursor-pointer">
+                                    <a data-fancybox="images" :href='image.src' :data-sources='image.src'
+                                        :data-caption="image.alt" class="cursor-pointer">
                                         <img :src="image.src" :alt="image.alt"
                                             class="rounded-xl object-cover w-full h-44 cursor-pointer" />
                                     </a>
@@ -378,57 +440,182 @@
             </div>
 
             <!-- Card Artikel -->
-            <div class="grid gap-8 md:grid-cols-3">
-                <!-- Artikel 1 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition">
-                    <img src="img/pembangunan.jpg" alt="Kolam Renang Jernih"
-                        class="rounded-xl mb-4 w-full h-48 object-cover" />
-                    <p class="text-gray-600 mb-2 text-sm">2 Agustus 2025</p>
-                    <h3 class="font-semibold text-lg mb-2">
-                        Langkah Mudah Menjaga Air Kolam Tetap Jernih Sepanjang Tahun
-                    </h3>
-                    <p class="text-gray-600 mb-4 text-sm">
-                        Air kolam yang keruh atau berwarna hijau adalah masalah umum yang
-                        sering dihadapi pemilik kolam renang, jadi lakukan beberapa
-                        langkah berikut.
-                    </p>
-                    <a href="#" class="text-blue-600 font-medium text-sm hover:underline">
-                        Baca Selengkapnya
-                    </a>
+            <!-- resources/views/components/artikel-slider.blade.php -->
+
+            <!-- Responsive Article Slider - Fixed Version -->
+            <div x-data="artikelSlider(@js($artikels))" x-init="init()" @mouseenter="stopAutoPlay()"
+                @mouseleave="startAutoPlay()" class="relative px-4 py-8">
+
+                <!-- Slider Container -->
+                <div class="overflow-hidden" x-ref="slider">
+                    <div class="flex transition-transform duration-500 ease-in-out"
+                        :style="`transform: translateX(-${currentSlide * (100 / itemsPerView())}%)`">
+
+                        <!-- Article Cards -->
+                        @foreach ($artikels as $artikel)
+                            <div class="flex-shrink-0 px-3 mb-2 w-full md:w-1/2 lg:w-1/3">
+                                <div
+                                    class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden h-full mb-2">
+                                    <!-- Article Image -->
+                                    <div class="relative overflow-hidden h-48">
+                                        <img src="{{ Storage::url($artikel->image) }}" alt="Image-{{ $artikel->title }}"
+                                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                                            loading="lazy" />
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                    </div>
+
+                                    <!-- Article Content -->
+                                    <div class="p-6">
+                                        <!-- Date -->
+                                        <p class="text-sm text-gray-500 mb-3 flex items-center">
+                                            <i class="fa-solid fa-calendar-days me-2"></i>
+                                            {{ $artikel->created_at->format('d M Y') }}
+                                        </p>
+
+                                        <!-- Title -->
+                                        <h3 class="text-xl font-semibold text-gray-900 mb-3 line-clamp-2 leading-tight">
+                                            {{ $artikel->title }}
+                                        </h3>
+
+                                        <!-- Excerpt -->
+                                        <div class="text-gray-600 mb-4 line-clamp-3 text-sm leading-relaxed">
+                                            <span x-text="getExcerpt(@js($artikel->content), 120)"></span>
+                                        </div>
+
+                                        <!-- Read More Button -->
+                                        <button @click="openModal(@js($artikel))"
+                                            class="inline-flex items-center text-blue-600 hover:text-blue-800 hover:underline font-medium text-sm transition-colors duration-200 cursor-pointer">
+                                            Baca Selengkapnya
+                                            <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
-                <!-- Artikel 2 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition">
-                    <img src="img/pembangunan.jpg" alt="Kolam Renang Alga"
-                        class="rounded-xl mb-4 w-full h-48 object-cover" />
-                    <p class="text-gray-600 mb-2 text-sm">2 Agustus 2025</p>
-                    <h3 class="font-semibold text-lg mb-2">
-                        Cara Praktis Mengatasi Alga dan Air Kolam Hijau dalam Semalam
-                    </h3>
-                    <p class="text-gray-600 mb-4 text-sm">
-                        Melihat air kolam renang yang tadinya jernih tiba-tiba berubah
-                        menjadi hijau karena alga tentu sangat menjengkelkan.
-                    </p>
-                    <a href="#" class="text-blue-600 font-medium text-sm hover:underline">
-                        Baca Selengkapnya
-                    </a>
+                <!-- Navigation Arrows -->
+                <div class="flex justify-center gap-2 mt-4" x-show="shouldShowNavigation()">
+                    <button @click="prevSlide()"
+                        class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
+                        :disabled="currentSlide === 0"
+                        :class="{ 'opacity-50 cursor-not-allowed': currentSlide === 0, 'hover:border-blue-500': currentSlide >
+                            0 }">
+                        <i class="fa-solid fa-chevron-left text-gray-600"></i>
+                    </button>
+                    <button @click="nextSlide()"
+                        class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
+                        :disabled="currentSlide >= maxSlide()"
+                        :class="{ 'opacity-50 cursor-not-allowed': currentSlide >=
+                        maxSlide(), 'hover:border-blue-500': currentSlide < maxSlide() }">
+                        <i class="fa-solid fa-chevron-right text-gray-600"></i>
+                    </button>
                 </div>
 
-                <!-- Artikel 3 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition">
-                    <img src="img/pembangunan.jpg" alt="Kolam Renang Flamingo"
-                        class="rounded-xl mb-4 w-full h-48 object-cover" />
-                    <p class="text-gray-600 mb-2 text-sm">2 Agustus 2025</p>
-                    <h3 class="font-semibold text-lg mb-2">
-                        Menjaga Kolam Renang Tetap Bersinar dengan Alat Sederhana
-                    </h3>
-                    <p class="text-gray-600 mb-4 text-sm">
-                        Pembersihan kolam renang tidak harus selalu mahal atau rumit.
-                        Artikel ini menyediakan panduan langkah demi langkah.
-                    </p>
-                    <a href="#" class="text-blue-600 font-medium text-sm hover:underline">
-                        Baca Selengkapnya
-                    </a>
+                <!-- Indicators -->
+                <div class="flex justify-center gap-2 mt-2" x-show="shouldShowNavigation()">
+                    <template x-for="(dot, index) in Array.from({length: maxSlide() + 1})" :key="index">
+                        <button @click="goToSlide(index)" class="w-3 h-3 rounded-full transition-colors duration-200"
+                            :class="currentSlide === index ? 'bg-blue-600' : 'bg-gray-300 hover:bg-gray-400'">
+                        </button>
+                    </template>
+                </div>
+
+                <!-- Modal -->
+                <div x-show="showModal" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+
+                    <!-- Backdrop -->
+                    <div class="fixed inset-0 bg-black/50 transition-opacity" @click="closeModal()"></div>
+
+                    <!-- Modal Content -->
+                    <div class="flex min-h-full items-center justify-center p-4">
+                        <div x-show="showModal" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+                            @click.stop>
+
+                            <!-- Close Button -->
+                            <button @click="closeModal()"
+                                class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors duration-200">
+                                <i class="fa-solid fa-times text-gray-600"></i>
+                            </button>
+
+                            <!-- Modal Body -->
+                            <div class="overflow-y-auto max-h-[90vh]" x-show="selectedArtikel">
+                                <!-- Hero Image -->
+                                <div class="relative h-64 md:h-80 overflow-hidden">
+                                    <img :src="selectedArtikel ? '{{ Storage::url('') }}' + selectedArtikel.image : ''"
+                                        :alt="selectedArtikel ? 'Image-' + selectedArtikel.title : ''"
+                                        class="w-full h-full object-cover" />
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="p-6 md:p-8">
+                                    <!-- Date -->
+                                    <p class="text-sm text-gray-500 mb-4 flex items-center">
+                                        <i class="fa-solid fa-calendar-days me-2"></i>
+                                        <span
+                                            x-text="selectedArtikel ? formatDate(selectedArtikel.created_at) : ''"></span>
+                                    </p>
+
+                                    <!-- Title -->
+                                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight"
+                                        x-text="selectedArtikel ? selectedArtikel.title : ''"></h1>
+
+                                    <!-- Content -->
+                                    <div class="prose prose-lg max-w-none mb-8">
+                                        <div x-html="selectedArtikel ? selectedArtikel.content : ''"
+                                            class="text-gray-700 leading-relaxed"></div>
+                                    </div>
+
+                                    <!-- Tags -->
+                                    <div class="mb-8"
+                                        x-show="selectedArtikel && selectedArtikel.tags && selectedArtikel.tags.length > 0">
+                                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Tags:</h4>
+                                        <div class="flex flex-wrap gap-2">
+                                            <template x-for="tag in (selectedArtikel ? selectedArtikel.tags || [] : [])"
+                                                :key="tag">
+                                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                                                    x-text="tag"></span>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Footer -->
+                                    <div class="border-t pt-6">
+                                        <div
+                                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                            <div class="text-sm text-gray-500">
+                                                Dipublikasikan pada
+                                                <span
+                                                    x-text="selectedArtikel ? formatDateLong(selectedArtikel.created_at) : ''"
+                                                    class="font-medium"></span>
+                                            </div>
+                                            <div class="flex gap-3">
+                                                <button @click="shareArticle()"
+                                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm">
+                                                    <i class="fa-solid fa-share me-2"></i>Bagikan
+                                                </button>
+                                                <button @click="closeModal()"
+                                                    class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-sm">
+                                                    Tutup
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -570,3 +757,6 @@
     </footer>
 
 @endsection
+
+@push('scripts')
+@endpush

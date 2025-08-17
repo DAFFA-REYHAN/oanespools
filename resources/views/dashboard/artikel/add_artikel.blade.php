@@ -131,8 +131,6 @@
                         <div class="card-body">
                             <form class="browser-default-validation col-md-8 offset-md-2" enctype="multipart/form-data"
                                 action="{{ route('artikel.store') }}" method="POST">
-                                @csrf
-                                @method('post')
 
                                 <div class="mb-4">
                                     <label class="form-label fw-bolder" for="title">Judul Artikel</label>
@@ -396,11 +394,13 @@
             document.getElementById('submitButton').addEventListener('click', function(event) {
                 event.preventDefault();
 
-                let formData = new FormData(document.querySelector('form'));
+                let formData = new FormData(document.querySelector('form.browser-default-validation'));
 
                 if (quill) {
                     const content = quill.root.innerHTML;
+                     formData.delete('content');
                     formData.append('content', content);
+                    console.log('Quill content added:', content);
                 }
 
                 fetch("{{ route('artikel.store') }}", {

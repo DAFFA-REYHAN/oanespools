@@ -133,7 +133,6 @@
                                         placeholder="Masukkan Nama Layanan" name="nama_layanan"
                                         value="{{ old('nama_layanan', $layanan->nama_layanan) }}" required />
                                 </div>
-
                                 <!-- Image Upload Section -->
                                 <div class="mb-4">
                                     <label class="form-label fw-bolder" for="gambar">Gambar</label>

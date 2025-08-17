@@ -21,7 +21,7 @@ class HomeController extends Controller
         $images = Gallery::where('type', 'gambar')->orderBy('created_at', 'desc')->get();
 
         // Artikel
-        $artikels = Artikel::select('title', 'content', 'image', 'created_at')->latest()->limit(3)->get();
+        $artikels = Artikel::select('title', 'content', 'image', 'created_at')->latest()->get();
 
         // Debug - hapus setelah berhasil
         \Log::info('Videos count: ' . $videos->count());

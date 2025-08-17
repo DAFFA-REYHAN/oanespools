@@ -42,7 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/artikel/store', [ArtikelController::class, 'store'])->name('artikel.store');
     Route::get('/artikel/{artikel}', [ArtikelController::class, 'show'])->name('artikel.show');
     Route::get('/artikel/{artikel}/edit', [ArtikelController::class, 'edit'])->name('artikel.edit');
-    Route::put('/artikel/{artikel}', [ArtikelController::class, 'update'])->name('artikel.update');
+    Route::post('/artikel/{artikel}', [ArtikelController::class, 'update'])->name('artikel.update');
     Route::delete('/artikel/{artikel}', [ArtikelController::class, 'destroy'])->name('artikel.destroy');
 
     Route::get('/rating', [RatingController::class, 'index'])->name('rating');

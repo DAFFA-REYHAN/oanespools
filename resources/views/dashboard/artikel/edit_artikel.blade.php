@@ -409,7 +409,7 @@
             document.getElementById('submitButton').addEventListener('click', function(event) {
                 event.preventDefault();
 
-                let formData = new FormData(document.querySelector('form'));
+                let formData = new FormData(document.querySelector('form.browser-default-validation'));
 
                 if (quill) {
                     const content = quill.root.innerHTML;
