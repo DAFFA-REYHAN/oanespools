@@ -353,16 +353,16 @@
             @if ($videoItems->isNotEmpty())
 
                 {{-- Main Video Slider --}}
-                <div class="relative mb-10 rounded-2xl overflow-hidden max-h-[400px]">
-                    <div class="mySwiper js-video-swiper max-h-[400px]">
+                <div class="relative mb-10 rounded-2xl overflow-hidden max-h-[500px] max-w-[1000px] mx-auto">
+                    <div class="mySwiper js-video-swiper max-h-[500px] max-w-[1000px]">
                         <div class="swiper-wrapper">
                             @foreach ($videoItems as $it)
-                                <div class="swiper-slide max-h-[400px]">
+                                <div class="swiper-slide max-h-[500px] max-w-[1000px]">
                                     <a data-fancybox="videos" href="{{ $it->href }}"
                                         data-caption="{{ $it->title }}"
                                         class="block relative rounded-2xl object-cove=h-44 cursor-pointer">
 
-                                        <div class="relative pt-[56.25%] bg-black max-h-[400px]">
+                                        <div class="relative pt-[56.25%] bg-black max-h-[600px] max-w-[1000px]">
                                             <img src="{{ $it->thumb }}" alt="{{ $it->title }}"
                                                 class="absolute inset-0 h-44  object-cover transition-transform duration-300 group-hover:scale-105"
                                                 loading="lazy" />
@@ -383,9 +383,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div class="swiper-button-next  hide-for-small-only hide-for-medium-only" style="color: gray;">
-                        </div>
-                        <div class="swiper-button-prev  hide-for-small-only hide-for-medium-only" style="color: gray;">
+                    
                         </div>
                     </div>
                 </div>
