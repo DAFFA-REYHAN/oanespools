@@ -1,13 +1,66 @@
 @extends('app')
 
+@section('title', 'Oanes Pools')
+
+
+
+@push('styles')
+    <style>
+        /* Slider Styles */
+        .swiper-container {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Fancybox Styles */
+        .fancybox-content {
+            background-color: #fff;
+            border-radius: 10px;
+            max-width: 80vw;
+            max-height: 80vh;
+        }
+
+        .swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            background: #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+    </style>
+@endpush
 
 @section('content')
-    <!-- Hero Section -->
+
+    {{-- HERO --}}
     <section class="relative px-6 pb-32">
         <div class="relative bg-cover bg-center rounded-2xl overflow-hidden"
             style="background-image: url('img/header.jpg'); height: 600px">
             <!-- Overlay -->
-            <div class="absolute inset-0 bg-black bg-opacity-30 rounded-2xl"></div>
+            <div class="absolute inset-0 bg-black/30 rounded-2xl"></div>
 
             <!-- Text Content -->
             <div class="absolute inset-0 flex flex-col justify-center px-8 sm:px-12 lg:px-20 text-white">
@@ -22,25 +75,36 @@
             </div>
             <div class="absolute bottom-10 right-8 flex gap-4 z-12">
                 <div class="bg-white p-8 rounded-2xl shadow-lg w-48 text-center">
-                    <p class="text-3xl font-bold">{{ $hero->jumlah_proyek }}+</p>
+                    <p class="text-3xl font-bold">14+</p>
                     <p class="text-md text-gray-700 mt-1">Proyek Selesai</p>
                 </div>
                 <div class="bg-white p-8 rounded-2xl shadow-lg w-48 text-center">
-                    <p class="text-3xl font-bold">{{ $hero->jumlah_pelanggan }}+</p>
+                    <p class="text-3xl font-bold">50+</p>
                     <p class="text-md text-gray-700 mt-1">Pelanggan</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!--Services Section-->
-    <section class="px-6 py-20 bg-gray-50" x-data="popupCards()">
+    {{-- SERVICES --}}
+    @php
+        $cards = isset($layanans)
+            ? $layanans->map(
+                fn($l) => [
+                    'title' => $l->nama_layanan,
+                    'subtitle' => 'Layanan Kolam Renang',
+                    'image' => asset('storage/' . $l->gambar),
+                    'description' => $l->deskripsi, // HTML
+                ],
+            )
+            : collect([]);
+    @endphp
+
+    <section class="px-6 py-20 bg-gray-50" x-data="popupCards({{ Js::from($cards) }})">
         <div class="max-w-7xl mx-auto">
-            <!-- Heading -->
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
                 <h2 class="text-3xl sm:text-4xl font-bold max-w-lg">
-                    Kami Melayani Beragam <br />
-                    Kebutuhan Anda
+                    Kami Melayani Beragam <br /> Kebutuhan Anda
                 </h2>
                 <p class="text-gray-700 text-md max-w-2xl">
                     Apapun kebutuhan kolam renang Anda, kami punya solusinya. Kami
@@ -50,9 +114,7 @@
                 </p>
             </div>
 
-            <!-- Card Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Debugging: Log cards array to console -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                 <template x-for="(card, index) in cards" :key="index">
                     <div class="relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
                         @click="openModal(card)">
@@ -67,15 +129,13 @@
                 </template>
             </div>
 
-            <!-- Modal -->
-            <div x-show="showModal" x-transition
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
+            {{-- Modal --}}
+            <div x-show="showModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
                 @click.self="closeModal()">
                 <div class="bg-white rounded-lg max-w-xl w-full overflow-hidden shadow-lg">
                     <img :src="selectedCard.image" class="w-full h-64 object-cover" />
                     <div class="p-6">
                         <h3 class="text-2xl font-semibold mb-2" x-text="selectedCard.title"></h3>
-                        <!-- Use x-html to render HTML content -->
                         <div class="text-gray-600 mb-4" x-html="selectedCard.description"></div>
                         <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" @click="closeModal()">
                             Tutup
@@ -86,7 +146,7 @@
         </div>
     </section>
 
-    <!--Why Choose Us Section-->
+    {{-- WHY US (ikon pakai Font Awesome dari npm, lihat langkah 4) --}}
     <section class="px-6 py-20 bg-white">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
@@ -109,7 +169,10 @@
                 <div class="flex gap-4 bg-white border rounded-2xl p-10 shadow-sm">
                     <div class="text-blue-600 text-3xl">
                         <!-- Icon dummy -->
-                        <i class="iconbase fa-solid fa-people-group"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="w-8 h-8">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
                     </div>
                     <div>
                         <h3 class="text-lg font-bold mb-3">Tim Profesional</h3>
@@ -127,7 +190,11 @@
                 <div class="flex gap-4 bg-white border rounded-2xl p-10 shadow-sm">
                     <div class="text-blue-600 text-3xl">
                         <!-- Icon dummy -->
-                        <i class="iconbase fa-solid fa-clock"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="w-8 h-8">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h4l3 10h7l3-10h4" />
+                        </svg>
                     </div>
                     <div>
                         <h3 class="text-lg font-bold mb-3">Cepat dan Akurat</h3>
@@ -144,7 +211,11 @@
                 <div class="flex gap-4 bg-white border rounded-2xl p-10 shadow-sm">
                     <div class="text-blue-600 text-3xl">
                         <!-- Icon dummy -->
-                        <i class="iconbase fa-solid fa-box"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="w-8 h-8">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01" />
+                        </svg>
                     </div>
                     <div>
                         <h3 class="text-lg font-bold mb-3">Bahan Berkualitas</h3>
@@ -161,7 +232,12 @@
                 <div class="flex gap-4 bg-white border rounded-2xl p-10 shadow-sm">
                     <div class="text-blue-600 text-3xl">
                         <!-- Icon dummy -->
-                        <i class="iconbase fa-solid fa-money-bill"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="w-8 h-8">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c1.5 0 3 1 3 2.5S13.5 13 12 13s-3-1-3-2.5S10.5 8 12 8z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 6v12h16V6" />
+                        </svg>
                     </div>
                     <div>
                         <h3 class="text-lg font-bold mb-3">Harga Bersahabat</h3>
@@ -178,9 +254,28 @@
         </div>
     </section>
 
-    <!--Gallery Section-->
+    {{-- GALLERY --}}
+    @php
+        // Gambar dan video dengan data yang terpisah
+        $imageData = $images->map(
+            fn($img) => [
+                'src' => asset('storage/' . $img->path),
+                'alt' => $img->name,
+            ],
+        );
+
+        $videoItems = $videos->filter(fn($g) => $g->type === 'video' && $g->is_youtube)->map(function ($g) {
+            return (object) [
+                'title' => $g->name ?? 'Video',
+                'href' => $g->full_url, // URL YouTube original → Fancybox auto-embed
+                'thumb' => $g->thumbnail_url ?? asset('img/placeholder-video.jpg'),
+            ];
+        });
+    @endphp
+
     <section class="px-6 py-20">
         <div class="max-w-7xl mx-auto">
+
             <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between mb-8 gap-6">
                 <h2 class="text-3xl sm:text-4xl font-bold max-w-xl">
@@ -194,23 +289,48 @@
                 </p>
             </div>
 
-            <!-- Video Thumbnail -->
-            <div class="relative mb-10 rounded-2xl overflow-hidden shadow-lg">
-                <img src="img/video.jpg" alt="Video Proyek Kolam" class="w-full h-[400px] object-cover" />
-                <a href="#" class="absolute inset-0 flex items-center justify-center">
-                    <div class="bg-white/80 rounded-full p-4 hover:bg-white transition">
-                        <!-- Play Icon -->
-                        <svg class="w-10 h-10 text-black" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M6.5 5.5a1 1 0 011.538-.843l6 4a1 1 0 010 1.686l-6 4A1 1 0 016.5 13.5v-8z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                </a>
-            </div>
+            {{-- =================== VIDEO SLIDER =================== --}}
+            @if ($videoItems->isNotEmpty())
 
-            <!-- Gallery Grid -->
-            <section class="bg-white" x-data="gallerySlider()" x-init="startSlide()">
+                {{-- Main Video Slider --}}
+                <div class="relative mb-10 rounded-2xl overflow-hidden max-h-[400px]">
+                    <div class="mySwiper js-video-swiper max-h-[400px]">
+                        <div class="swiper-wrapper">
+                            @foreach ($videoItems as $it)
+                                <div class="swiper-slide max-h-[400px]">
+                                    <a data-fancybox="videos" href="{{ $it->href }}"
+                                        data-caption="{{ $it->title }}"
+                                        class="block relative rounded-2xl object-cove=h-44 cursor-pointer">
+
+                                        <div class="relative pt-[56.25%] bg-black max-h-[400px]">
+                                            <img src="{{ $it->thumb }}" alt="{{ $it->title }}"
+                                                class="absolute inset-0 h-44  object-cover transition-transform duration-300 group-hover:scale-105"
+                                                loading="lazy" />
+
+                                            <!-- Centering the Play Button -->
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <div class="bg-white/80 rounded-full p-4 backdrop-blur-sm">
+                                                    <svg class="w-8 h-8 text-black" viewBox="0 0 20 20"
+                                                        fill="currentColor">
+                                                        <path fill-rule="evenodd"
+                                                            d="M6.5 5.5a1 1 0 011.538-.843l6 4a1 1 0 010 1.686l-6 4A1 1 0 016.5 13.5v-8z"
+                                                            clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="swiper-button-next  hide-for-small-only hide-for-medium-only"  style="color: gray;"></div>
+                        <div class="swiper-button-prev  hide-for-small-only hide-for-medium-only"  style="color: gray;"></div>
+                    </div>
+                </div>
+
+            @endif
+
+            <section class="bg-white" x-data="gallerySlider({{ Js::from($imageData) }})" x-init="startSlide()">
                 <div class="max-w-8xl mx-auto">
                     <!-- Slide Container -->
                     <div class="relative overflow-hidden h-44">
@@ -222,47 +342,26 @@
                                     'translate-x-full': currentSet !== groupIndex && groupIndex > currentSet
                                 }">
                                 <template x-for="(image, index) in group" :key="index">
-                                    <img :src="image.src" :alt="image.alt"
-                                        class="rounded-xl object-cover w-full h-44 cursor-pointer"
-                                        @click="openImage(image.src)" />
+                                    <!-- Menggunakan image.src dan image.alt yang benar -->
+                                    <a data-fancybox="images" :href='image.src' :data-sources='image.src' :data-caption="image.alt"
+                                        class="cursor-pointer">
+                                        <img :src="image.src" :alt="image.alt"
+                                            class="rounded-xl object-cover w-full h-44 cursor-pointer" />
+                                    </a>
                                 </template>
                             </div>
                         </template>
+
                     </div>
 
-                    <!-- Modal Popup -->
-                    <div x-show="showModal" x-transition
-                        class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-                        @click.self="closeImage()">
-                        <div class="relative">
-                            <button class="absolute top-0 right-0 text-white text-3xl px-4 py-2" @click="closeImage()">
-                                &times;
-                            </button>
-                            <img :src="selectedImage" class="max-h-[80vh] max-w-[90vw] rounded-lg shadow-lg" />
-                        </div>
-                    </div>
+                    <!-- Modal Popup (Handled by Fancybox) -->
                 </div>
             </section>
-            <!-- <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <img
-                        src="img/pembangunan.jpg"
-                        alt="Before After 1"
-                        class="rounded-xl object-cover w-full h-44" />
-                      <img
-                        src="img/header.jpg"
-                        alt="Before After 2"
-                        class="rounded-xl object-cover w-full h-44" />
-                      <img
-                        src="img/renovasi.jpg"
-                        alt="Before After 3"
-                        class="rounded-xl object-cover w-full h-44" />
-                      <img
-                        src="img/perawatan.jpg"
-                        alt="Before After 4"
-                        class="rounded-xl object-cover w-full h-44" />
-                    </div> -->
+
+
         </div>
     </section>
+
 
     <!--Article Section-->
     <section class="px-6 py-20 bg-white text-black">
@@ -356,10 +455,10 @@
             </div>
 
             <!-- Testimonials Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Testimonial 1 -->
-                <div class="border rounded-2xl p-6 shadow-sm">
-                    <p class="text-gray-800 text-sm mb-4">
+                <div class="border rounded-2xl p-10 shadow-sm">
+                    <p class="text-gray-800 text-lg mb-4">
                         "Saya sangat puas dengan hasilnya! Mulai dari konsultasi sampai
                         kolam renang selesai, timnya sangat profesional dan komunikatif.
                         Kualitas bahannya juga tidak main-main. Kolam renang impian
@@ -372,35 +471,8 @@
                 </div>
 
                 <!-- Testimonial 2 -->
-                <div class="border rounded-2xl p-6 shadow-sm">
-                    <p class="text-gray-800 text-sm mb-4">
-                        "Pelayanan purna jualnya jempolan! Setelah pembangunan kolam
-                        renang selesai, mereka masih rutin membantu perawatan. Timnya
-                        sigap dan selalu memberikan solusi terbaik jika ada masalah. Saya
-                        merasa tenang karena kolam renang saya selalu terawat dengan
-                        baik."
-                    </p>
-                    <div>
-                        <p class="font-semibold text-lg">Bpk. Darey</p>
-                        <p class="text-gray-600">Bandung Barat</p>
-                    </div>
-                </div>
-                <div class="border rounded-2xl p-6 shadow-sm">
-                    <p class="text-gray-800 text-sm mb-4">
-                        "Saya sangat puas dengan hasilnya! Mulai dari konsultasi sampai
-                        kolam renang selesai, timnya sangat profesional dan komunikatif.
-                        Kualitas bahannya juga tidak main-main. Kolam renang impian
-                        keluarga kami akhirnya terwujud. Terima kasih banyak!"
-                    </p>
-                    <div>
-                        <p class="font-semibold text-lg">Bpk. Jonanda</p>
-                        <p class="text-gray-600">Jakarta Selatan</p>
-                    </div>
-                </div>
-
-                <!-- Testimonial 2 -->
-                <div class="border rounded-2xl p-6 shadow-sm">
-                    <p class="text-gray-800 text-sm mb-4">
+                <div class="border rounded-2xl p-10 shadow-sm">
+                    <p class="text-gray-800 text-lg mb-4">
                         "Pelayanan purna jualnya jempolan! Setelah pembangunan kolam
                         renang selesai, mereka masih rutin membantu perawatan. Timnya
                         sigap dan selalu memberikan solusi terbaik jika ada masalah. Saya
@@ -496,4 +568,5 @@
             Oanes Pools 2025 | Syarat dan Ketentuan Berlaku
         </div>
     </footer>
+
 @endsection

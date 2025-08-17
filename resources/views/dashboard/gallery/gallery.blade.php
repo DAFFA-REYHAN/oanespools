@@ -86,7 +86,7 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Gambar</h5>
                             <small class="text-body-secondary float-end">
-                                @if ($imageCount >= 3)
+                                @if ($imageCount >= 12)
                                     <button class="btn btn-sm text-danger" disabled>Max 12 Gambar</button>
                                 @else
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal"

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Gallery extends Model
 {
@@ -11,91 +13,130 @@ class Gallery extends Model
 
     protected $fillable = ['name', 'type', 'path'];
 
-    // Scope untuk tipe tertentu
-    public function scopeType($query, $type)
-    {
-        return $query->where('type', $type);
-    }
+    /**
+     * Attribute yang akan ditambahkan saat toArray()/JSON
+     */
+    protected $appends = ['is_youtube', 'full_url', 'thumbnail_url'];
 
-    // Scope untuk video
+    /* ===========================
+     | Scopes
+     ============================*/
     public function scopeVideo($query)
     {
         return $query->where('type', 'video');
     }
 
-    // Scope untuk gambar
     public function scopeImage($query)
     {
         return $query->where('type', 'gambar');
     }
 
-    // Accessor untuk menentukan apakah ini YouTube
-    public function getIsYoutubeAttribute()
+    /* ===========================
+     | Accessors
+     ============================*/
+
+    public function getIsYoutubeAttribute(): bool
     {
         return $this->type === 'video' && $this->isYouTubeUrl($this->path);
     }
 
-    // Accessor untuk URL lengkap
-    public function getFullUrlAttribute()
+    /**
+     * URL siap pakai untuk video atau gambar
+     * - YouTube: kembalikan original URL
+     * - URL absolut lain: kembalikan apa adanya
+     * - Path lokal storage: Storage::url()
+     */
+    public function getFullUrlAttribute(): ?string
     {
-        if ($this->is_youtube) {
-            return $this->path; // Sudah URL lengkap
+        $path = $this->path;
+
+        if (!$path) {
+            return null;
         }
 
-        return Storage::url($this->path);
-    }
-
-    // Accessor untuk thumbnail YouTube
-    public function getThumbnailUrlAttribute()
-    {
         if ($this->is_youtube) {
-            return $this->getYouTubeThumbnail();
+            return $path;
         }
 
-        return null; // Untuk video lokal, bisa ditambahkan logic thumbnail
+        if ($this->isAbsoluteUrl($path)) {
+            return $path;
+        }
+
+        // path relatif → storage url
+        return Storage::url($path);
     }
 
-    // Accessor untuk YouTube embed URL
-    public function getEmbedUrlAttribute()
+    /**
+     * Thumbnail URL untuk YouTube video
+     */
+    public function getThumbnailUrlAttribute(): ?string
     {
         if (!$this->is_youtube) {
             return null;
         }
 
-        return $this->convertToEmbedUrl($this->path);
+        $id = $this->extractYouTubeId($this->path);
+        if (!$id) {
+            return null;
+        }
+
+        // Gunakan hqdefault.jpg untuk kompatibilitas yang lebih baik
+        return "https://img.youtube.com/vi/{$id}/hqdefault.jpg";
     }
 
-    // Helper untuk mendapatkan YouTube thumbnail
-    private function getYouTubeThumbnail()
+    /* ===========================
+     | Helper Methods
+     ============================*/
+
+    private function isYouTubeUrl(string $url): bool
     {
-        $patterns = ['/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', '/youtu\.be\/([a-zA-Z0-9_-]+)/', '/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/'];
+        if (!$this->isAbsoluteUrl($url)) {
+            return false;
+        }
+
+        $host = parse_url($url, PHP_URL_HOST) ?: '';
+        $host = Str::lower($host);
+
+        return Str::contains($host, 'youtube.com') || Str::contains($host, 'youtu.be');
+    }
+
+    private function isAbsoluteUrl(string $path): bool
+    {
+        return Str::startsWith($path, ['http://', 'https://', '//']);
+    }
+
+    /**
+     * Ekstrak YouTube Video ID dari berbagai bentuk URL
+     */
+    private function extractYouTubeId(string $url): ?string
+    {
+        // 1) Coba parse query param ?v=
+        $parsed = parse_url($url);
+        if (!empty($parsed['query'])) {
+            parse_str($parsed['query'], $q);
+            if (!empty($q['v']) && $this->isValidYouTubeId($q['v'])) {
+                return $q['v'];
+            }
+        }
+
+        // 2) Cek path pattern: /embed/ID, /shorts/ID, youtu.be/ID
+        $patterns = [
+            '#/embed/([a-zA-Z0-9_-]{6,})#i',
+            '#/shorts/([a-zA-Z0-9_-]{6,})#i',
+            '#youtu\.be/([a-zA-Z0-9_-]{6,})#i'
+        ];
 
         foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $this->path, $matches)) {
-                return "https://img.youtube.com/vi/{$matches[1]}/maxresdefault.jpg";
+            if (preg_match($pattern, $url, $m) && $this->isValidYouTubeId($m[1])) {
+                return $m[1];
             }
         }
 
         return null;
     }
 
-    // Helper untuk convert ke embed URL
-    private function convertToEmbedUrl($url)
+    private function isValidYouTubeId(string $id): bool
     {
-        $patterns = ['/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', '/youtu\.be\/([a-zA-Z0-9_-]+)/', '/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/'];
-
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $url, $matches)) {
-                return "https://www.youtube.com/embed/{$matches[1]}?enablejsapi=1";
-            }
-        }
-
-        return $url; // fallback
-    }
-
-    // Cek apakah URL adalah YouTube
-    private function isYouTubeUrl($url)
-    {
-        return strpos($url, 'youtube.com') !== false || strpos($url, 'youtu.be') !== false;
+        return (bool) preg_match('/^[a-zA-Z0-9_-]{6,}$/', $id);
     }
 }
