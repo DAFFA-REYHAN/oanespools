@@ -116,7 +116,7 @@
     {{-- HERO --}}
     <section class="relative px-6 pb-16">
         <div class="relative bg-cover bg-center rounded-2xl overflow-hidden"
-            style="background-image: url('img/header.jpg'); height: 600px">
+            style="background-image: url('img/header.jpg'); height: 630px">
             <!-- Overlay -->
             <div class="absolute inset-0 bg-black/30 rounded-2xl"></div>
 
