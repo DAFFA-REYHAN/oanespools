@@ -40,42 +40,51 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($videos as $video)
-                                            <tr>
-                                                <td>{{ $video->name }}</td>
-                                                <td>
-                                                    @if ($video->path)
-                                                        @php
-                                                            $videoId = explode('v=', $video->path)[1] ?? null;
-                                                            $videoId = explode('&', $videoId)[0] ?? null;
-                                                            $embedUrl = $videoId
-                                                                ? "https://www.youtube.com/embed/{$videoId}"
-                                                                : null;
-                                                        @endphp
-                                                        @if ($embedUrl)
-                                                            <iframe width="250" height="150" src="{{ $embedUrl }}"
-                                                                frameborder="0"
-                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                                allowfullscreen></iframe>
+                                        @if (!$videos->isEmpty())
+                                            @foreach ($videos as $video)
+                                                <tr>
+                                                    <td>{{ $video->name }}</td>
+                                                    <td>
+                                                        @if ($video->path)
+                                                            @php
+                                                                $videoId = explode('v=', $video->path)[1] ?? null;
+                                                                $videoId = explode('&', $videoId)[0] ?? null;
+                                                                $embedUrl = $videoId
+                                                                    ? "https://www.youtube.com/embed/{$videoId}"
+                                                                    : null;
+                                                            @endphp
+                                                            @if ($embedUrl)
+                                                                <iframe width="250" height="150"
+                                                                    src="{{ $embedUrl }}" frameborder="0"
+                                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                    allowfullscreen></iframe>
+                                                            @else
+                                                                No Video Available
+                                                            @endif
                                                         @else
                                                             No Video Available
                                                         @endif
-                                                    @else
-                                                        No Video Available
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <form action="{{ route('gallery.destroy', $video->id) }}" method="POST"
-                                                        class="delete-form" id="videoDeleteForm">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger btn-sm deleteButton"
-                                                            data-id="video-{{ $video->id }}"><i
-                                                                class="icon-base ti tabler-trash me-2"></i> Hapus</button>
-                                                    </form>
-                                                </td>
+                                                    </td>
+                                                    <td>
+                                                        <form action="{{ route('gallery.destroy', $video->id) }}"
+                                                            method="POST" class="delete-form" id="videoDeleteForm">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm deleteButton"
+                                                                data-id="video-{{ $video->id }}"><i
+                                                                    class="icon-base ti tabler-trash me-2"></i>
+                                                                Hapus</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="3" class="text-center"> Belum ada Data</td>
                                             </tr>
-                                        @endforeach
+
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -105,25 +114,33 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($images as $image)
+                                        @if (!$videos->isEmpty())
+                                            @foreach ($images as $image)
+                                                <tr>
+                                                    <td>{{ $image->name }}</td>
+                                                    <td>
+                                                        <img src="{{ Storage::url($image->path) }}"
+                                                            alt="Gambar {{ $image->name }}" height="150px" />
+                                                    </td>
+                                                    <td>
+                                                        <form action="{{ route('gallery.destroy', $image->id) }}"
+                                                            method="POST" class="delete-form" id="imageDeleteForm">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm deleteButton"
+                                                                data-id="image-{{ $image->id }}"><i
+                                                                    class="icon-base ti tabler-trash me-2"></i>
+                                                                Hapus</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @else
                                             <tr>
-                                                <td>{{ $image->name }}</td>
-                                                <td>
-                                                    <img src="{{ Storage::url($image->path) }}"
-                                                        alt="Gambar {{ $image->name }}" height="150px" />
-                                                </td>
-                                                <td>
-                                                    <form action="{{ route('gallery.destroy', $image->id) }}" method="POST"
-                                                        class="delete-form" id="imageDeleteForm">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger btn-sm deleteButton"
-                                                            data-id="image-{{ $image->id }}"><i
-                                                                class="icon-base ti tabler-trash me-2"></i> Hapus</button>
-                                                    </form>
-                                                </td>
+                                                <td colspan="3" class="text-center"> Belum ada Data</td>
                                             </tr>
-                                        @endforeach
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -222,10 +239,10 @@
                 let itemName = "";
                 if (itemId.includes('video')) {
                     // If it's a video, get the video name
-                    itemName = "{{ $video->name }}";
+                    itemName = "{{ $video->name ?? '' }}";
                 } else {
                     // If it's an image, get the image name
-                    itemName = "{{ $image->name }}";
+                    itemName = "{{ $image->name ?? '' }}";
                 }
 
                 Swal.fire({

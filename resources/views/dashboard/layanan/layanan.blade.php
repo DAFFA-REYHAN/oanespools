@@ -59,7 +59,7 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="mb-0">Layanan </h4>
                             <small class="text-body-secondary float-end">
-                                @if ($layananCount >= 8)
+                                @if ($layananCount >= 6)
                                     <button class="btn btn-sm text-danger" disabled>Max 8 Layanan</button>
                                 @else
                                     <a href="{{ route('add-layanan') }}" class="btn btn-primary btn-sm"> + Tambah
