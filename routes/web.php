@@ -8,7 +8,7 @@ use App\Http\Controllers\LayananController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\RatingController;
-
+use App\Http\Controllers\TestimoniController;
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -46,4 +46,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/artikel/{artikel}', [ArtikelController::class, 'destroy'])->name('artikel.destroy');
 
     Route::get('/rating', [RatingController::class, 'index'])->name('rating');
+
+    // Route::get('/', [TestimoniController::class, 'index'])->name('home');
+    // Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
+    // Route::get('/dashboard', [TestimoniController::class, 'list'])->middleware(['auth'])->name('dashboard');
+
 });
