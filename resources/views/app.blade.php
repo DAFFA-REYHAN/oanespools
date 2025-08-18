@@ -14,9 +14,9 @@
     {{-- Google Fonts (opsional, ini bukan CDN lib JS/CSS) --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet" />
-        <link rel="stylesheet" href="{{ asset('vuexy/assets/vendor/fonts/fontawesome.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vuexy/assets/vendor/fonts/fontawesome.css') }}" />
 
     {{-- Vite: CSS & JS utama --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -30,10 +30,6 @@
 <body class="bg-gray-50 font-sans antialiased" x-data="{ sidebarOpen: false, darkMode: false }" :class="{ 'dark': darkMode }" x-cloak>
     @include('components.header')
     @yield('content')
-
-
-
-  
 </body>
 
 </html>
