@@ -6,12 +6,17 @@ use App\Models\Hero;
 use App\Models\Layanan;
 use App\Models\Artikel;
 use App\Models\Gallery; // <- pastikan model ini ada
+use App\Models\Testimoni;
 use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
       public function index()
     {
+
+        // testimoni
+        $testimonis = Testimoni::latest()->take(6)->get();
+
         // Ringkasan hero & layanan
         $hero = Hero::select('jumlah_proyek', 'jumlah_pelanggan')->first();
         $layanans = Layanan::select('nama_layanan', 'gambar', 'deskripsi')->get();
@@ -31,6 +36,6 @@ class HomeController extends Controller
             \Log::info('First video: ' . $videos->first()->name . ' - ' . $videos->first()->path);
         }
 
-        return view('index', compact('hero', 'layanans', 'artikels', 'videos', 'images'));
+        return view('index', compact('hero', 'layanans', 'artikels', 'videos', 'images', 'testimonis'));
     }
 }

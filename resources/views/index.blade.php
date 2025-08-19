@@ -159,7 +159,7 @@
             : collect([]);
     @endphp
 
-    <section class="px-6 py-20 bg-gray-50" x-data="popupCards({{ Js::from($cards) }})">
+    <section class="px-6 py-10 bg-gray-50" x-data="popupCards({{ Js::from($cards) }})">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
                 <h2 class="text-3xl sm:text-4xl font-bold max-w-lg">
@@ -204,8 +204,8 @@
         </div>
     </section>
 
-    {{-- WHY US (ikon pakai Font Awesome dari npm, lihat langkah 4) --}}
-    <section class="px-6 py-20">
+    {{-- WHY CHOOSE US --}}
+    <section class="px-6 py-10">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
@@ -316,7 +316,7 @@
 
     {{-- GALLERY --}}
     @php
-        // Gambar dan video dengan data yang terpisah
+        // Data gambar
         $imageData = $images->map(
             fn($img) => [
                 'src' => asset('storage/' . $img->path),
@@ -324,16 +324,17 @@
             ],
         );
 
+        // Data video
         $videoItems = $videos->filter(fn($g) => $g->type === 'video' && $g->is_youtube)->map(function ($g) {
             return (object) [
                 'title' => $g->name ?? 'Video',
-                'href' => $g->full_url, // URL YouTube original → Fancybox auto-embed
+                'href' => $g->full_url,
                 'thumb' => $g->thumbnail_url ?? asset('img/placeholder-video.jpg'),
             ];
         });
     @endphp
 
-    <section class="px-6 py-20">
+    <section class="px-6 py-10">
         <div class="max-w-7xl mx-auto">
 
             <!-- Header -->
@@ -351,8 +352,6 @@
 
             {{-- =================== VIDEO SLIDER =================== --}}
             @if ($videoItems->isNotEmpty())
-
-                {{-- Main Video Slider --}}
                 <div class="relative mb-10 rounded-2xl overflow-hidden max-h-[500px] max-w-[1000px] mx-auto">
                     <div class="mySwiper js-video-swiper max-h-[500px] max-w-[1000px]">
                         <div class="swiper-wrapper">
@@ -361,13 +360,12 @@
                                     <a data-fancybox="videos" href="{{ $it->href }}"
                                         data-caption="{{ $it->title }}"
                                         class="block relative rounded-2xl object-cove=h-44 cursor-pointer">
-
                                         <div class="relative pt-[56.25%] bg-black max-h-[600px] max-w-[1000px]">
                                             <img src="{{ $it->thumb }}" alt="{{ $it->title }}"
-                                                class="absolute inset-0 h-44  object-cover transition-transform duration-300 group-hover:scale-105"
+                                                class="absolute inset-0 h-44 object-cover transition-transform duration-300 group-hover:scale-105"
                                                 loading="lazy" />
 
-                                            <!-- Centering the Play Button -->
+                                            <!-- Play Button -->
                                             <div class="absolute inset-0 flex items-center justify-center">
                                                 <div class="bg-white/80 rounded-full p-4 backdrop-blur-sm">
                                                     <svg class="w-8 h-8 text-black" viewBox="0 0 20 20"
@@ -383,48 +381,60 @@
                                 </div>
                             @endforeach
                         </div>
-
                     </div>
                 </div>
-        </div>
+            @else
+                <p class="text-center text-gray-500 mb-10">📹 Data video belum ada</p>
+            @endif
 
-        @endif
-
-        <section class="bg-white" x-data="gallerySlider({{ Js::from($imageData) }})" x-init="startSlide()">
-            <div class="max-w-8xl mx-auto">
-                <!-- Slide Container -->
-                <div class="relative overflow-hidden h-44">
-                    <template x-for="(group, groupIndex) in imageGroups" :key="groupIndex">
-                        <div class="absolute top-0 left-0 w-full grid grid-cols-2 md:grid-cols-4 gap-4 transition-transform duration-700 ease-in-out"
-                            :class="{
-                                'translate-x-0': currentSet === groupIndex,
-                                '-translate-x-full': currentSet !== groupIndex && groupIndex < currentSet,
-                                'translate-x-full': currentSet !== groupIndex && groupIndex > currentSet
-                            }">
-                            <template x-for="(image, index) in group" :key="index">
-                                <!-- Menggunakan image.src dan image.alt yang benar -->
-                                <a data-fancybox="images" :href='image.src' :data-sources='image.src'
-                                    :data-caption="image.alt" class="cursor-pointer">
-                                    <img :src="image.src" :alt="image.alt"
-                                        class="rounded-xl object-cover w-full h-44 cursor-pointer" />
-                                </a>
+            {{-- =================== IMAGE SLIDER =================== --}}
+            @if ($imageData->isNotEmpty())
+                <section class="px-6" x-data="gallerySlider({{ Js::from($imageData) }})" x-init="startSlide()">
+                    <div class="max-w-7xl mx-auto">
+                        <!-- Slide Container -->
+                        <div class="relative overflow-hidden h-44">
+                            <template x-for="(group, groupIndex) in imageGroups" :key="groupIndex">
+                                <div class="absolute top-0 left-0 w-full grid grid-cols-2 md:grid-cols-4 gap-4 transition-transform duration-700 ease-in-out"
+                                    :class="{
+                                        'translate-x-0': currentSet === groupIndex,
+                                        '-translate-x-full': currentSet !== groupIndex && groupIndex < currentSet,
+                                        'translate-x-full': currentSet !== groupIndex && groupIndex > currentSet
+                                    }">
+                                    <template x-for="(image, index) in group" :key="index">
+                                        <!-- Trigger Fancybox -->
+                                        <a data-fancybox="gallery" :href="image.src" :data-caption="image.alt"
+                                            class="cursor-pointer">
+                                            <img :src="image.src" :alt="image.alt"
+                                                class="rounded-xl object-cover w-full h-44 cursor-pointer" />
+                                        </a>
+                                    </template>
+                                </div>
                             </template>
                         </div>
-                    </template>
+                    </div>
+                </section>
+            @else
+                <p class="text-center text-gray-500 mt-10">🖼️ Data gambar belum ada</p>
+            @endif
 
-                </div>
-
-                <!-- Modal Popup (Handled by Fancybox) -->
-            </div>
-        </section>
-
-
+            <!-- Fancybox JS -->
+            <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+            <script>
+                Fancybox.bind("[data-fancybox='gallery']", {
+                    Thumbs: {
+                        autoStart: true
+                    },
+                    Toolbar: {
+                        display: ["zoom", "close"]
+                    },
+                });
+            </script>
         </div>
     </section>
 
 
-    <!--Article Section-->
-    <section class="px-6 py-20 text-black">
+    {{-- ARTICLE --}}
+    <section class="px-6 py-10 text-black">
         <div class="max-w-7xl mx-auto">
             <!-- Heading -->
             <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-12">
@@ -517,7 +527,7 @@
                     </button>
                 </div>
 
-                <!-- Indicators -->
+                <!-- Indicators (GAPERLU INI) -->
                 {{-- <div class="flex justify-center gap-2 mt-2" x-show="shouldShowNavigation()">
                     <template x-for="(dot, index) in Array.from({length: maxSlide() + 1})" :key="index">
                         <button @click="goToSlide(index)" class="w-3 h-3 rounded-full transition-colors duration-200"
@@ -549,7 +559,7 @@
                             <!-- Close Button -->
                             <button @click="closeModal()"
                                 class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors duration-200">
-                                <i class="fa-solid fa-times text-gray-600"></i>
+                                <i class="cursor-pointer fa-solid fa-times text-gray-600"></i>
                             </button>
 
                             <!-- Modal Body -->
@@ -625,9 +635,13 @@
         </div>
     </section>
 
-    <!--Testimoni Section-->
-    <section class="px-6 py-20">
+    {{-- TESTIMONI --}}
+    <section class="px-6 py-10" x-data="{
+        current: 0,
+        total: Math.ceil({{ count($testimonis) }} / 2)
+    }">
         <div class="max-w-7xl mx-auto">
+
             <!-- Heading -->
             <div class="flex flex-col md:flex-row justify-between mb-12 gap-8">
                 <div class="md:w-1/2">
@@ -642,48 +656,44 @@
                 </p>
             </div>
 
-            <!-- Testimonials Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Testimonial 1 -->
-                <div class="bg-white rounded-2xl p-10">
-                    <p class="text-gray-800 text-lg mb-4">
-                        "Saya sangat puas dengan hasilnya! Mulai dari konsultasi sampai
-                        kolam renang selesai, timnya sangat profesional dan komunikatif.
-                        Kualitas bahannya juga tidak main-main. Kolam renang impian
-                        keluarga kami akhirnya terwujud. Terima kasih banyak!"
-                    </p>
-                    <div>
-                        <p class="font-semibold text-lg">Bpk. Jonanda</p>
-                        <p class="text-gray-600">Jakarta Selatan</p>
-                    </div>
-                </div>
+            <!-- Testimonials Slider -->
+            @if ($testimonis->isNotEmpty())
+                <div class="overflow-hidden relative">
+                    <div class="flex transition-transform duration-700 ease-in-out"
+                        :style="`transform: translateX(-${current * 100}%)`">
 
-                <!-- Testimonial 2 -->
-                <div class="bg-white rounded-2xl p-10">
-                    <p class="text-gray-800 text-lg mb-4">
-                        "Pelayanan purna jualnya jempolan! Setelah pembangunan kolam
-                        renang selesai, mereka masih rutin membantu perawatan. Timnya
-                        sigap dan selalu memberikan solusi terbaik jika ada masalah. Saya
-                        merasa tenang karena kolam renang saya selalu terawat dengan
-                        baik."
-                    </p>
-                    <div>
-                        <p class="font-semibold text-lg">Bpk. Darey</p>
-                        <p class="text-gray-600">Bandung Barat</p>
+                        @foreach ($testimonis as $testi)
+                            <div class="w-full md:w-1/2 flex-shrink-0 px-3">
+                                <div class="bg-white rounded-2xl p-10">
+                                    <p class="text-gray-800 text-lg mb-4">
+                                        {{ $testi->pesan }}
+                                    </p>
+                                    <div>
+                                        <p class="font-semibold text-lg">{{ $testi->nama }}</p>
+                                        <p class="text-gray-600">{{ $testi->domisili }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
                     </div>
                 </div>
-            </div>
+            @else
+                <p class="text-center text-gray-500">Belum ada testimoni.</p>
+            @endif
 
             <!-- Arrows -->
-            <div class="flex justify-center mt-10 gap-4">
-                <button class="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100 transition"
+            <div class="flex justify-center mt-10 gap-4" x-show="total > 1">
+                <button @click="current = current > 0 ? current - 1 : 0"
+                    class="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100 transition"
                     aria-label="Sebelumnya">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
-                <button class="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100 transition"
+                <button @click="current = current + 1 < total ? current + 1 : current"
+                    class="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100 transition"
                     aria-label="Selanjutnya">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -693,6 +703,7 @@
             </div>
         </div>
     </section>
+
 
     <!-- Footer -->
     <footer class="bg-black text-white px-6 pt-12 pb-6">
@@ -735,7 +746,7 @@
             </div>
 
             <!-- Kanan: Form Penilaian -->
-            <div>
+            {{-- <div>
                 <h4 class="text-lg font-semibold mb-4">Beri Kami Penilaian</h4>
                 <form class="space-y-4">
                     <div>
@@ -753,6 +764,22 @@
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-sm text-white py-2 px-4 rounded-lg">
                         Kirim penilaian
                     </button>
+                </form>
+            </div> --}}
+            <div>
+                @if (session('success'))
+                    <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <form action="{{ route('testimoni.store') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <input type="text" name="nama" placeholder="Nama" class="w-full border p-2 rounded" required>
+                    <input type="text" name="domisili" placeholder="Domisili" class="w-full border p-2 rounded"
+                        required>
+                    <textarea name="pesan" rows="4" placeholder="Pesan" class="w-full border p-2 rounded" required></textarea>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Kirim</button>
                 </form>
             </div>
         </div>

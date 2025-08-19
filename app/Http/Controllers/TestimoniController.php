@@ -7,38 +7,41 @@ use App\Models\Testimoni;
 
 class TestimoniController extends Controller
 {
-    // Halaman utama (landing page)
-    public function index()
-    {
-        // Ambil max 6 testimoni terbaru untuk ditampilkan di landing page
-        $testimonis = Testimoni::latest()->take(6)->get();
-
-        return view('index', compact('testimonis'));
-    }
-
-    // Simpan testimoni dari form
+    // Simpan data dari form (frontend)
     public function store(Request $request)
     {
         $request->validate([
             'nama' => 'required|string|max:100',
-            'domisili' => 'nullable|string|max:100',
-            'pesan' => 'required|string',
+            'domisili' => 'required|string|max:100',
+            'pesan' => 'required|string|max:500',
         ]);
 
-        Testimoni::create([
-            'nama' => $request->nama,
-            'domisili' => $request->domisili,
-            'pesan' => $request->pesan,
-        ]);
+        Testimoni::create($request->all());
 
-        // Redirect ke dashboard + flash message sukses
-        return redirect('/dashboard')->with('success', 'Testimoni berhasil dikirim!');
+        return redirect()->back()->with('success', 'Terima kasih atas testimoni Anda!');
     }
 
-    // Halaman list testimoni (opsional untuk dashboard)
-    public function list()
+    // Tampilkan testimoni untuk publik (frontend)
+    public function index()
+    {
+        $testimonis = Testimoni::latest()->take(6)->get();
+        return view('index', compact('testimonis'));
+    }
+
+    // Tampilkan semua testimoni di dashboard (admin)
+    public function dashboard()
     {
         $testimonis = Testimoni::latest()->paginate(10);
-        return view('testimoni.index', compact('testimonis'));
+        return view('dashboard.testimoni.testimoni', compact('testimonis'));
     }
+
+    public function destroy($id)
+    {
+    $testimoni = Testimoni::findOrFail($id);
+    $testimoni->delete();
+
+    return response()->json(['success' => true]);
+    }
+
+
 }

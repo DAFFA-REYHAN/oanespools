@@ -60,7 +60,7 @@
                             <h4 class="mb-0">Layanan </h4>
                             <small class="text-body-secondary float-end">
                                 @if ($layananCount >= 6)
-                                    <button class="btn btn-sm text-danger" disabled>Max 8 Layanan</button>
+                                    <button class="btn btn-sm text-danger" disabled>Max 6 Layanan</button>
                                 @else
                                     <a href="{{ route('add-layanan') }}" class="btn btn-primary btn-sm"> + Tambah
                                         Layanan</a>

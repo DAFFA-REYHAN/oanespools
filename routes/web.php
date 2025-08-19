@@ -12,12 +12,15 @@ use App\Http\Controllers\TestimoniController;
 
 Route::get('/', [HomeController::class, 'index']);
 
+Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
+Route::get('/testimoni', [TestimoniController::class, 'index'])->name('testimoni.index'); // publik
+
 
 Route::get('/login', function () {
     return view('auth.login');
 });
 
-Route::post('/auth/login', [LoginController::class, 'login'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -45,10 +48,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/artikel/{artikel}', [ArtikelController::class, 'update'])->name('artikel.update');
     Route::delete('/artikel/{artikel}', [ArtikelController::class, 'destroy'])->name('artikel.destroy');
 
-    Route::get('/rating', [RatingController::class, 'index'])->name('rating');
-
-    // Route::get('/', [TestimoniController::class, 'index'])->name('home');
-    // Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
-    // Route::get('/dashboard', [TestimoniController::class, 'list'])->middleware(['auth'])->name('dashboard');
+    Route::get('/testimoni', [TestimoniController::class, 'dashboard'])->name('testimoni');
+    Route::delete('/testimoni/{id}', [TestimoniController::class, 'destroy'])->name('testimoni.destroy');
 
 });

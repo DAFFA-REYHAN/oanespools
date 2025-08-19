@@ -18,6 +18,9 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('vuexy/assets/vendor/fonts/fontawesome.css') }}" />
 
+    <!-- Ini Fancybox CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+
     {{-- Vite: CSS & JS utama --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
