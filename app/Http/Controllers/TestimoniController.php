@@ -37,10 +37,11 @@ class TestimoniController extends Controller
 
     public function destroy($id)
     {
-    $testimoni = Testimoni::findOrFail($id);
-    $testimoni->delete();
+        $testimoni = Testimoni::findOrFail($id);
+        $testimoni->delete();
 
-    return response()->json(['success' => true]);
+        return redirect()->route('testimoni')
+                        ->with('success', 'Testimoni berhasil dihapus');
     }
 
 
