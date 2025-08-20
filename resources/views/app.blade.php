@@ -21,6 +21,12 @@
     <!-- Ini Fancybox CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
 
+    <style>
+        body {
+            scroll-behavior: smooth;
+        }
+    </style>
+
     {{-- Vite: CSS & JS utama --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -33,6 +39,20 @@
 <body class="bg-gray-50 font-sans antialiased" x-data="{ sidebarOpen: false, darkMode: false }" :class="{ 'dark': darkMode }" x-cloak>
     @include('components.header')
     @yield('content')
+
+    <!-- Tombol untuk Scroll Up -->
+    <button x-data="{ showButton: false, isBottom: false }" x-show="showButton" x-cloak
+        x-on:click="window.scrollTo({ top: 0, behavior: 'smooth' })" x-init="window.addEventListener('scroll', () => {
+            const scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
+            const maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            showButton = scrollPosition > 100; // Tombol muncul setelah scroll lebih dari 100px
+            isBottom = scrollPosition === maxScroll; // Mengecek apakah sudah di bagian bawah
+        })"
+        :class="isBottom ? 'bottom-24' : 'bottom-4'"
+        class="fixed right-4 bg-blue-500 text-white p-5 rounded-full shadow-lg hover:bg-blue-700 transition duration-300">
+        <i class="iconbase fa-solid fa-arrow-up"></i>
+    </button>
+
 </body>
 
 </html>

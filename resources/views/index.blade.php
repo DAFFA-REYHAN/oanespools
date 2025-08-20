@@ -724,24 +724,52 @@
                     menghubungi kami. Tim ahli kami siap membantu Anda dari tahap
                     konsultasi hingga pengerjaan selesai.
                 </p>
-                <h3 class="font-base mb-4 flex flex-row items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                        <g fill="none" fill-rule="evenodd">
-                            <path
-                                d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                            <path fill="currentColor"
-                                d="M12 2a9 9 0 0 1 9 9c0 3.074-1.676 5.59-3.442 7.395a20.4 20.4 0 0 1-2.876 2.416l-.426.29l-.2.133l-.377.24l-.336.205l-.416.242a1.87 1.87 0 0 1-1.854 0l-.416-.242l-.52-.32l-.192-.125l-.41-.273a20.6 20.6 0 0 1-3.093-2.566C4.676 16.589 3 14.074 3 11a9 9 0 0 1 9-9m0 2a7 7 0 0 0-7 7c0 2.322 1.272 4.36 2.871 5.996a18 18 0 0 0 2.222 1.91l.458.326q.222.155.427.288l.39.25l.343.209l.289.169l.455-.269l.367-.23q.293-.186.627-.417l.458-.326a18 18 0 0 0 2.222-1.91C17.728 15.361 19 13.322 19 11a7 7 0 0 0-7-7m0 3a4 4 0 1 1 0 8a4 4 0 0 1 0-8m0 2a2 2 0 1 0 0 4a2 2 0 0 0 0-4" />
-                        </g>
-                    </svg>
-                    Jl. M Kahfi Jagakarsa, Jakarta Selatan, Indonesia
-                </h3>
-                <h3 class="font-base mb-16 flex flex-row items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5"
-                            d="M7.829 16.171a20.9 20.9 0 0 1-4.846-7.614c-.573-1.564-.048-3.282 1.13-4.46l.729-.728a2.11 2.11 0 0 1 2.987 0l1.707 1.707a2.11 2.11 0 0 1 0 2.987l-.42.42a1.81 1.81 0 0 0 0 2.56l3.84 3.841a1.81 1.81 0 0 0 2.56 0l.421-.42a2.11 2.11 0 0 1 2.987 0l1.707 1.707a2.11 2.11 0 0 1 0 2.987l-.728.728c-1.178 1.179-2.896 1.704-4.46 1.131a20.9 20.9 0 0 1-7.614-4.846Z" />
-                    </svg>
-                    0812 9110 0645
-                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <!-- WhatsApp -->
+                    <a href="https://wa.me/6281291100645" target="_blank"
+                        class="flex flex-row items-center mb-2 hover:underline">
+                        <h3 class="font-base flex flex-row items-center gap-2">
+                            <i class="iconbase fa-brands fa-whatsapp"></i>
+                            0812 9110 0645
+                        </h3>
+                    </a>
+
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/oanes_pools/" target="_blank"
+                        class="flex flex-row items-center mb-2 hover:underline">
+                        <h3 class="font-base flex flex-row items-center gap-2">
+                            <i class="iconbase fa-brands fa-instagram"></i>
+                            @oanes_pools
+                        </h3>
+                    </a>
+
+
+
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/oanes.pools" target="_blank"
+                        class="flex flex-row items-center mb-2 hover:underline">
+                        <h3 class="font-base flex flex-row items-center gap-2">
+                            <i class="iconbase fa-brands fa-facebook"></i>
+                            Oanes Pools
+                        </h3>
+                    </a>
+                    <!-- Gmail -->
+                    <a href="mailto:oanes@gmail.com" target="_blank"
+                        class="flex flex-row items-center mb-2 hover:underline">
+                        <h3 class="font-base flex flex-row items-center gap-2">
+                            <i class="iconbase fa-solid fa-envelope"></i>
+                            oanespools@gmail.com
+                        </h3>
+                    </a>
+                </div>
+
+                <a href="https://maps.app.goo.gl/kopSfsG9RngBUT6e8" target="_blank" class="flex flex-row items-center ">
+                    <h3 class="font-base mb-4 flex flex-row items-center gap-2">
+                        <i class="iconbase fa-solid fa-location-dot"></i>
+                        Jl. M Kahfi Jagakarsa, Jakarta Selatan, Indonesia
+                    </h3>
+                </a>
+
             </div>
 
             <!-- Kanan: Form Penilaian -->
@@ -794,7 +822,7 @@
                             d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95" />
                     </svg>
                 </a>
-                <a href="#" class="text-white hover:text-gray-300">
+                <a href="https://www.instagram.com/oanes_pools/" target="_blank" class="text-white hover:text-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                         <defs>
                             <mask id="SVGy4YSvdBO">
@@ -810,7 +838,7 @@
                         <path fill="currentColor" d="M0 0h48v48H0z" mask="url(#SVGy4YSvdBO)" />
                     </svg>
                 </a>
-                <a href="https://wa.me/6281291100645" class="text-white hover:text-gray-300">
+                <a href="https://wa.me/6281291100645" target="_blank" class="text-white hover:text-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor"
                             d="M12.001 2c5.523 0 10 4.477 10 10s-4.477 10-10 10a9.95 9.95 0 0 1-5.03-1.355L2.005 22l1.352-4.968A9.95 9.95 0 0 1 2.001 12c0-5.523 4.477-10 10-10M8.593 7.3l-.2.008a1 1 0 0 0-.372.1a1.3 1.3 0 0 0-.294.228c-.12.113-.188.211-.261.306A2.73 2.73 0 0 0 6.9 9.62c.002.49.13.967.33 1.413c.409.902 1.082 1.857 1.97 2.742c.214.213.424.427.65.626a9.45 9.45 0 0 0 3.84 2.046l.568.087c.185.01.37-.004.556-.013a2 2 0 0 0 .833-.231a5 5 0 0 0 .383-.22q.001.002.125-.09c.135-.1.218-.171.33-.288q.126-.13.21-.302c.078-.163.156-.474.188-.733c.024-.198.017-.306.014-.373c-.004-.107-.093-.218-.19-.265l-.582-.261s-.87-.379-1.402-.621a.5.5 0 0 0-.176-.041a.48.48 0 0 0-.378.127c-.005-.002-.072.055-.795.931a.35.35 0 0 1-.368.13a1.4 1.4 0 0 1-.191-.066c-.124-.052-.167-.072-.252-.108a6 6 0 0 1-1.575-1.003c-.126-.11-.243-.23-.363-.346a6.3 6.3 0 0 1-1.02-1.268l-.059-.095a1 1 0 0 1-.102-.205c-.038-.147.061-.265.061-.265s.243-.266.356-.41c.11-.14.203-.276.263-.373c.118-.19.155-.385.093-.536q-.42-1.026-.868-2.041c-.059-.134-.234-.23-.393-.249q-.081-.01-.162-.016a3 3 0 0 0-.403.004z" />
