@@ -10,15 +10,73 @@ class TestimoniController extends Controller
     // Simpan data dari form (frontend)
     public function store(Request $request)
     {
-        $request->validate([
-            'nama' => 'required|string|max:100',
-            'domisili' => 'required|string|max:100',
-            'pesan' => 'required|string|max:500',
-        ]);
+        try {
+            // Validasi
+            $request->validate(
+                [
+                    'nama' => 'required|string|max:100',
+                    'domisili' => 'required|string|max:100',
+                    'pesan' => 'required|string|max:500',
+                ],
+                [
+                    'nama.required' => 'Nama wajib diisi',
+                    'nama.max' => 'Nama maksimal 100 karakter',
+                    'domisili.required' => 'Domisili wajib diisi',
+                    'domisili.max' => 'Domisili maksimal 100 karakter',
+                    'pesan.required' => 'Pesan wajib diisi',
+                    'pesan.max' => 'Pesan maksimal 500 karakter',
+                ],
+            );
 
-        Testimoni::create($request->all());
+            // Simpan testimoni
+            $testimoni = Testimoni::create($request->all());
 
-        return redirect()->back()->with('success', 'Terima kasih atas testimoni Anda!');
+            // Cek apakah request AJAX atau tidak
+            if ($request->ajax() || $request->wantsJson()) {
+                // Response untuk AJAX
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => 'Terima kasih atas testimoni Anda!',
+                        'data' => $testimoni,
+                    ],
+                    201,
+                );
+            }
+
+            // Response untuk form biasa (non-AJAX)
+            return redirect()->back()->with('success', 'Terima kasih atas testimoni Anda!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation errors
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Data yang dimasukkan tidak valid',
+                        'errors' => $e->errors(),
+                    ],
+                    422,
+                );
+            }
+
+            // Untuk form biasa, Laravel akan handle otomatis
+            throw $e;
+        } catch (\Exception $e) {
+            // Handle general errors
+            \Log::error('Error saat menyimpan testimoni: ' . $e->getMessage());
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.',
+                    ],
+                    500,
+                );
+            }
+
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        }
     }
 
     // Tampilkan testimoni untuk publik (frontend)
@@ -40,9 +98,6 @@ class TestimoniController extends Controller
         $testimoni = Testimoni::findOrFail($id);
         $testimoni->delete();
 
-        return redirect()->route('testimoni')
-                        ->with('success', 'Testimoni berhasil dihapus');
+        return redirect()->route('testimoni')->with('success', 'Testimoni berhasil dihapus');
     }
-
-
 }

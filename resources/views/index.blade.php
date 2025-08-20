@@ -127,7 +127,7 @@
                     Solusi Lengkap <br />
                     Kolam Renang Anda
                 </h1>
-                <a href="#"
+                <a href="https://wa.me/6281291100645" target="_blank"
                     class="font-semibold mt-6 w-max px-5 py-3 border border-white rounded-full text-sm hover:bg-white hover:text-black transition">Hubungi
                     Kami</a>
             </div>
@@ -772,13 +772,13 @@
                     </div>
                 @endif
 
-                <form action="{{ route('testimoni.store') }}" method="POST" class="space-y-4">
+                <form id="formTestimoni" action="{{ route('testimoni.store') }}" method="POST" class="space-y-4">
                     @csrf
                     <input type="text" name="nama" placeholder="Nama" class="w-full border p-2 rounded" required>
                     <input type="text" name="domisili" placeholder="Domisili" class="w-full border p-2 rounded"
                         required>
                     <textarea name="pesan" rows="4" placeholder="Pesan" class="w-full border p-2 rounded" required></textarea>
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Kirim</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">Kirim</button>
                 </form>
             </div>
         </div>
@@ -823,4 +823,61 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Simple testimonial form handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action*="testimoni"]');
+            if (!form) return;
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const btn = this.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+
+                // Loading
+                btn.disabled = true;
+                btn.innerHTML = 'Mengirim...';
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: new FormData(this),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        // Sukses
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: result.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Reload halaman untuk update testimoni
+                            window.location.reload();
+                        });
+                    } else {
+                        // Error
+                        const errorMsg = result.errors ?
+                            Object.values(result.errors).flat().join('\n') :
+                            result.message || 'Terjadi kesalahan';
+
+                        Swal.fire('Error!', errorMsg, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error!', 'Terjadi kesalahan', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            });
+        });
+    </script>
 @endpush

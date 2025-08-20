@@ -10,7 +10,7 @@ use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\TestimoniController;
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('index');
 
 Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
 Route::get('/testimoni', [TestimoniController::class, 'index'])->name('testimoni.index'); // publik
