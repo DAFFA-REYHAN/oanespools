@@ -37,7 +37,7 @@
 {{-- Alpine: state root pakai x-data. Dark mode class toggle --}}
 
 <body class="bg-gray-50 font-sans antialiased" x-data="{ sidebarOpen: false, darkMode: false }" :class="{ 'dark': darkMode }" x-cloak>
-    @include('components.header')
+    {{-- @include('components.header') --}}
     @yield('content')
 
     <!-- Tombol untuk Scroll Up -->
