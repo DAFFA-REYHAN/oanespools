@@ -129,7 +129,7 @@
                     Kolam Renang Anda
                 </h1>
                 <a href="https://wa.me/6281291100645" target="_blank"
-                    class="font-semibold mt-6 w-max px-4 sm:px-5 py-2 sm:py-3 border border-white rounded-full text-xs sm:text-sm md:text-base hover:bg-white hover:text-black transition">
+                    class="font-semibold mt-6 w-max px-4 sm:px-5 py-2 sm:py-3 text-center border border-white rounded-full text-xs sm:text-sm md:text-base hover:bg-white hover:text-black transition">
                     Hubungi Kami
                 </a>
             </div>
@@ -329,13 +329,7 @@
         );
 
         // Data video
-        $videoItems = $videos->filter(fn($g) => $g->type === 'video' && $g->is_youtube)->map(function ($g) {
-            return (object) [
-                'title' => $g->name ?? 'Video',
-                'href' => $g->full_url,
-                'thumb' => $g->thumbnail_url ?? asset('img/placeholder-video.jpg'),
-            ];
-        });
+        $videoItems = $videos;
     @endphp
 
     <section class="px-4 sm:px-6 py-10">
@@ -356,39 +350,84 @@
             {{-- =================== VIDEO SLIDER =================== --}}
             @if ($videoItems->isNotEmpty())
                 <div class="relative mb-10 rounded-2xl overflow-hidden max-h-[500px] max-w-[1000px] mx-auto">
-                    <div class="mySwiper js-video-swiper max-h-[500px] max-w-[1000px]">
+                    <div class="mySwiper  max-h-[500px] max-w-[1000px]">
                         <div class="swiper-wrapper">
                             @foreach ($videoItems as $it)
-                                <div class="swiper-slide max-h-[500px] max-w-[1000px]">
-                                    <a data-fancybox="videos" href="{{ $it->href }}"
-                                        data-caption="{{ $it->title }}"
-                                        class="block relative rounded-2xl object-cove=h-44 cursor-pointer">
-                                        <div class="relative pt-[56.25%] bg-black max-h-[600px] max-w-[1000px]">
-                                            <img src="{{ $it->thumb }}" alt="{{ $it->title }}"
-                                                class="absolute inset-0 h-44 object-cover transition-transform duration-300 group-hover:scale-105"
-                                                loading="lazy" />
+                                <div class="swiper-slide  max-h-[200] sm:max-h-[200] lg:max-h-[500px] max-w-[1000px]">
+                                    <!-- Link ke Fancybox untuk membuka video di modal -->
+                                    <a data-fancybox="videos" href="#video-{{ $it->id }}"
+                                        data-caption="<h6 class='text-center'>{{ $it->name ?? 'Video' }}</h6>  <p class='text-center'>{{ $it->created_at->format('d M Y H:i') }}</p>"
+                                        class="block relative rounded-2xl cursor-pointer group">
+                                        <div
+                                            class="relative pt-[56.25%] max-h-[500px] max-w-[1000px] rounded-2xl overflow-hidden bg-black">
+                                            <!-- Video placeholder (thumbnail bisa diganti dengan poster hitam jika tidak ada thumbnail) -->
+                                            <video class="absolute inset-0 w-full h-full object-cover" preload="metadata">
+                                                <source src="{{ Storage::url($it->path) }}" type="video/mp4">
+                                                <source src="{{ Storage::url($it->path) }}" type="video/webm">
+                                                <source src="{{ Storage::url($it->path) }}" type="video/ogg">
+                                                Your browser does not support the video tag.
+                                            </video>
 
-                                            <!-- Play Button -->
-                                            <div class="absolute inset-0 flex items-center justify-center">
-                                                <div class="bg-white/80 rounded-full p-4 backdrop-blur-sm">
+                                            <!-- Play Button Overlay -->
+                                            <div class="absolute inset-0 flex items-center justify-center group">
+                                                <button
+                                                    class="bg-white/80 rounded-full p-4 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                                     <svg class="w-8 h-8 text-black" viewBox="0 0 20 20"
                                                         fill="currentColor">
                                                         <path fill-rule="evenodd"
                                                             d="M6.5 5.5a1 1 0 011.538-.843l6 4a1 1 0 010 1.686l-6 4A1 1 0 016.5 13.5v-8z"
                                                             clip-rule="evenodd" />
                                                     </svg>
-                                                </div>
+                                                </button>
                                             </div>
                                         </div>
                                     </a>
+
+                                    <!-- Hidden video element for Fancybox -->
+                                    <div id="video-{{ $it->id }}" style="display: none; max-width: 900px;">
+                                        <video width="100%" height="auto" controls autoplay
+                                            style="max-height:70vh; border-radius:8px;">
+                                            <source src="{{ Storage::url($it->path) }}" type="video/mp4">
+                                            <source src="{{ Storage::url($it->path) }}" type="video/webm">
+                                            <source src="{{ Storage::url($it->path) }}" type="video/ogg">
+                                            Your browser does not support the video tag.
+                                        </video>
+
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
+
+                        <!-- Swiper Pagination & Navigation -->
+                        @if ($videoItems->count() > 1)
+                            <div
+                                class="swiper-button-next !text-white !bg-black/50 !rounded-full !w-10 !h-10 after:!text-sm">
+                            </div>
+                            <div
+                                class="swiper-button-prev !text-white !bg-black/50 !rounded-full !w-10 !h-10 after:!text-sm">
+                            </div>
+                            <div class="swiper-pagination !bottom-4"></div>
+                        @endif
                     </div>
                 </div>
+
+                <!-- Swiper Init -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+
+
+                        // Fancybox Init for videos
+                        Fancybox.bind("[data-fancybox='videos']", {
+                            infinite: true,
+                            hideScrollbar: true,
+                        });
+                    });
+                </script>
             @else
                 <p class="text-center text-gray-500 mb-10">📹 Data video belum ada</p>
             @endif
+
+
 
             {{-- =================== IMAGE SLIDER =================== --}}
             @if ($imageData->isNotEmpty())
@@ -435,7 +474,7 @@
         </div>
     </section>
 
-    {{-- ARTICLE --}}
+    <!-- {{-- ARTICLE --}} -->
     <section class="px-4 sm:px-6 py-10">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
@@ -707,7 +746,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-white px-6 pt-12 pb-6">
+    <footer class="bg-black text-white px-6 pt-12 pb-6">
         <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-48">
             <!-- Kiri: Informasi Kontak -->
             <div class="mx-auto max-w-6xl">
@@ -717,7 +756,7 @@
                     <span class="text-xl font-bold text-blue-600 italic">Oanes Pools</span>
                 </div>
                 <!-- Headline -->
-                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <h3 class="text-xl font-bold text-gray-300 mb-4">
                     Hubungi Kami untuk Mewujudkan Kolam Renang Impian Anda!
                 </h3>
                 <!-- Deskripsi -->
@@ -745,11 +784,7 @@
             </div>
 
             <div>
-                @if (session('success'))
-                    <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
-                        {{ session('success') }}
-                    </div>
-                @endif
+
 
                 <form id="formTestimoni" action="{{ route('testimoni.store') }}" method="POST" class="space-y-4">
                     @csrf
@@ -768,7 +803,7 @@
 
         <!-- Bawah: Copyright -->
         <div
-            class="max-w-7xl mx-auto flex flex-row justify-between mt-12 border-t border-gray-200 pt-6 text-sm text-gray-700">
+            class="max-w-7xl mx-auto flex flex-row justify-between mt-12 border-t border-gray-200 pt-6 text-sm text-gray-500">
             <!-- Icon Sosial -->
             <div class="flex space-x-4">
                 <div class="flex flex-row items-center mb-2">

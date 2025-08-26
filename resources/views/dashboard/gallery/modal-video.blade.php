@@ -1,96 +1,219 @@
-  <!-- Modal to Add YouTube Video -->
-  <div class="modal fade" id="addVideoModal" tabindex="-1" aria-labelledby="addVideoModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="addVideoModalLabel">Tambah Video YouTube</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <!-- Form to add YouTube video -->
-                  <form method="POST" action="{{ route('gallery.store') }}">
-                      @csrf
-                      <input type="hidden" name="type" value="video">
-                      <!-- Video Title -->
-                      <div class="mb-3">
-                          <label for="videoTitle" class="form-label">Judul Video</label>
-                          <input type="text" class="form-control" id="videoTitle" name="name"
-                              placeholder="Video Title" required>
-                      </div>
+<div class="modal fade" id="addVideoModal" tabindex="-1" aria-labelledby="addVideoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addVideoModalLabel">Tambah Video Lokal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form to add local video -->
+                <form method="POST" action="{{ route('gallery.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="type" value="video">
 
-                      <!-- YouTube URL -->
-                      <div class="mb-3">
-                          <label for="youtubeUrl" class="form-label">URL YouTube</label>
-                          <div class="input-group">
-                              <input type="url" class="form-control" id="youtubeUrl" name="path"
-                                  placeholder="https://www.youtube.com/watch?v=VIDEO_ID" required>
-                              <button type="button" class="btn btn-primary" id="searchVideoBtn">Search</button>
-                          </div>
-                      </div>
+                    <!-- Video Title -->
+                    <div class="mb-3">
+                        <label for="videoTitle" class="form-label">Judul Video</label>
+                        <input type="text" class="form-control" id="videoTitle" name="name"
+                            placeholder="Masukkan judul video" required>
+                    </div>
 
-                      <!-- Loading Spinner -->
-                      <div id="loadingSpinner" style="display:none; text-align:center;">
-                          <div class="spinner-border" role="status">
-                              <span class="visually-hidden">Loading...</span>
-                          </div>
-                          <p>Loading Video...</p>
-                      </div>
+                    <!-- Video File Upload -->
+                    <div class="mb-3">
+                        <label for="videoFile" class="form-label">Pilih Video</label>
+                        <input type="file" class="form-control" id="videoFile" name="video_file"
+                            accept="video/*" required>
+                        <div class="form-text">
+                            Format yang didukung: MP4, AVI, MOV, WMV, FLV, MKV (Maksimal 100MB)
+                        </div>
+                    </div>
 
-                      <!-- Video Embed Container (Preview) -->
-                      <div id="videoEmbedContainer" class="mt-3">
-                          <!-- Video iframe will appear here -->
-                      </div>
+                    <!-- Upload Progress Bar -->
+                    <div id="uploadProgress" style="display:none;">
+                        <div class="mb-2">
+                            <label class="form-label">Upload Progress:</label>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"
+                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                            </div>
+                        </div>
+                    </div>
 
-                      <!-- Save Button -->
-                      <button type="submit" class="btn btn-primary mt-3">Save</button>
-                  </form>
-              </div>
-          </div>
-      </div>
-  </div>
+                    <!-- Loading Spinner -->
+                    <div id="loadingSpinner" style="display:none; text-align:center;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Memproses video...</p>
+                    </div>
 
+                    <!-- Video Preview Container -->
+                    <div id="videoPreviewContainer" class="mt-3 mb-3" style="display:none;">
+                        <label class="form-label">Preview Video:</label>
+                        <div class="border rounded p-2">
+                            <video id="videoPreview" width="100%" height="300" controls style="border-radius: 8px;">
+                                Browser Anda tidak mendukung video tag.
+                            </video>
+                            <div class="mt-2">
+                                <small id="videoInfo" class="text-muted"></small>
+                            </div>
+                        </div>
+                    </div>
 
-  <script>
-      document.getElementById('searchVideoBtn').addEventListener('click', function() {
-          var youtubeUrl = document.getElementById('youtubeUrl').value;
+                    <!-- Save Button -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary" id="saveBtn">
+                            <i class="bi bi-cloud-upload"></i> Simpan Video
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-          // Check if URL is valid
-          if (!youtubeUrl) {
-              alert("Please provide the YouTube URL.");
-              return;
-          }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-          // Extract YouTube video ID from the URL
-          var videoId = extractVideoId(youtubeUrl);
+<script>
+    document.getElementById('videoFile').addEventListener('change', function(event) {
+        const file = event.target.files[0];
 
-          if (!videoId) {
-              alert("Invalid YouTube URL.");
-              return;
-          }
+        if (!file) {
+            hidePreview();
+            return;
+        }
 
-          // Show loading spinner inside the modal
-          document.getElementById('loadingSpinner').style.display = 'block'; // Show the spinner
+        // Validate file type
+        if (!file.type.startsWith('video/')) {
+            alert('File yang dipilih bukan video. Silakan pilih file video.');
+            event.target.value = '';
+            hidePreview();
+            return;
+        }
 
-          // Clear previous iframe (if any)
-          document.getElementById('videoEmbedContainer').innerHTML = '';
+        // Validate file size (100MB = 100 * 1024 * 1024 bytes)
+        const maxSize = 100 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('Ukuran file terlalu besar. Maksimal 100MB.');
+            event.target.value = '';
+            hidePreview();
+            return;
+        }
 
-          // Create an iframe for the video
-          var videoEmbed = `
-        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    `;
+        // Show loading spinner
+        document.getElementById('loadingSpinner').style.display = 'block';
 
-          // After 1 second, hide the loading spinner and show the iframe
-          setTimeout(function() {
-              document.getElementById('loadingSpinner').style.display = 'none'; // Hide the spinner
-              document.getElementById('videoEmbedContainer').innerHTML = videoEmbed; // Display the video
-          }, 1000);
-      });
+        // Create file URL for preview
+        const fileURL = URL.createObjectURL(file);
+        const videoPreview = document.getElementById('videoPreview');
 
-      // Function to extract YouTube video ID from URL
-      function extractVideoId(url) {
-          const youtubeRegex =
-              /(?:https?:\/\/(?:www\.)?youtu\.be\/|(?:https?:\/\/(?:www\.)?youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)))([a-zA-Z0-9_-]{11})/;
-          const match = url.match(youtubeRegex);
-          return match ? match[1] : null; // Return the video ID or null if no match
-      }
-  </script>
+        // Set video source
+        videoPreview.src = fileURL;
+
+        // Show file information
+        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+        const videoInfo = document.getElementById('videoInfo');
+        videoInfo.innerHTML = `
+            <strong>File:</strong> ${file.name}<br>
+            <strong>Ukuran:</strong> ${fileSize} MB<br>
+            <strong>Tipe:</strong> ${file.type}
+        `;
+
+        // Auto-fill title if empty
+        const titleInput = document.getElementById('videoTitle');
+        if (!titleInput.value) {
+            const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+            titleInput.value = fileName;
+        }
+
+        // Hide loading spinner and show preview after a short delay
+        setTimeout(function() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('videoPreviewContainer').style.display = 'block';
+        }, 1000);
+
+        // Clean up URL when modal is closed
+        const modal = document.getElementById('addVideoModal');
+        modal.addEventListener('hidden.bs.modal', function() {
+            URL.revokeObjectURL(fileURL);
+        });
+    });
+
+    function hidePreview() {
+        document.getElementById('videoPreviewContainer').style.display = 'none';
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('uploadProgress').style.display = 'none';
+    }
+
+    // Handle form submission with progress tracking
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const fileInput = document.getElementById('videoFile');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert('Silakan pilih file video terlebih dahulu.');
+            event.preventDefault();
+            return;
+        }
+
+        // Show upload progress
+        document.getElementById('uploadProgress').style.display = 'block';
+        document.getElementById('saveBtn').disabled = true;
+        document.getElementById('saveBtn').innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Uploading...';
+
+        // Simulate upload progress (replace this with actual upload progress if using AJAX)
+        simulateUploadProgress();
+    });
+
+    function simulateUploadProgress() {
+        const progressBar = document.querySelector('.progress-bar');
+        let progress = 0;
+
+        const interval = setInterval(function() {
+            progress += Math.random() * 15;
+            if (progress > 100) progress = 100;
+
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressBar.textContent = Math.round(progress) + '%';
+
+            if (progress >= 100) {
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+
+    // Reset form when modal is closed
+    document.getElementById('addVideoModal').addEventListener('hidden.bs.modal', function() {
+        document.querySelector('form').reset();
+        hidePreview();
+        document.getElementById('saveBtn').disabled = false;
+        document.getElementById('saveBtn').innerHTML = '<i class="bi bi-cloud-upload"></i> Simpan Video';
+    });
+
+    // Drag and drop functionality
+    const videoFileInput = document.getElementById('videoFile');
+    const modal = document.querySelector('.modal-body');
+
+    modal.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        modal.style.backgroundColor = '#f8f9fa';
+    });
+
+    modal.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        modal.style.backgroundColor = '';
+    });
+
+    modal.addEventListener('drop', function(e) {
+        e.preventDefault();
+        modal.style.backgroundColor = '';
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            videoFileInput.files = files;
+            videoFileInput.dispatchEvent(new Event('change'));
+        }
+    });
+</script>

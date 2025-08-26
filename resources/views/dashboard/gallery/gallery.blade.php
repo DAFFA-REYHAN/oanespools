@@ -46,44 +46,98 @@
                                                     <td>{{ $video->name }}</td>
                                                     <td>
                                                         @if ($video->path)
-                                                            @php
-                                                                $videoId = explode('v=', $video->path)[1] ?? null;
-                                                                $videoId = explode('&', $videoId)[0] ?? null;
-                                                                $embedUrl = $videoId
-                                                                    ? "https://www.youtube.com/embed/{$videoId}"
-                                                                    : null;
-                                                            @endphp
-                                                            @if ($embedUrl)
-                                                                <iframe width="250" height="150"
-                                                                    src="{{ $embedUrl }}" frameborder="0"
-                                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                                    allowfullscreen></iframe>
-                                                            @else
-                                                                No Video Available
-                                                            @endif
+                                                            <!-- Display Local Video using HTML5 video tag -->
+                                                            <video width="250" height="150" controls
+                                                                   style="border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                                                <source src="{{ Storage::url($video->path) }}" type="video/mp4">
+                                                                <source src="{{ Storage::url($video->path) }}" type="video/webm">
+                                                                <source src="{{ Storage::url($video->path) }}" type="video/ogg">
+                                                                Your browser does not support the video tag.
+                                                            </video>
+
+                                                            <!-- Optional: Video Info -->
+                                                            <div class="mt-2">
+                                                                <small class="text-muted d-block">
+                                                                    {{ pathinfo($video->path, PATHINFO_EXTENSION) }} •
+                                                                    @if(Storage::disk('public')->exists($video->path))
+                                                                        {{ number_format(Storage::disk('public')->size($video->path) / 1024 / 1024, 2) }} MB
+                                                                    @endif
+                                                                </small>
+                                                            </div>
                                                         @else
-                                                            No Video Available
+                                                            <div class="d-flex align-items-center justify-content-center"
+                                                                 style="width: 250px; height: 150px; background-color: #f8f9fa; border-radius: 8px;">
+                                                                <div class="text-center">
+                                                                    <i class="ti ti-video-off" style="font-size: 32px; color: #6c757d;"></i>
+                                                                    <p class="mb-0 text-muted small">No Video Available</p>
+                                                                </div>
+                                                            </div>
                                                         @endif
                                                     </td>
                                                     <td>
                                                         <form action="{{ route('gallery.destroy', $video->id) }}"
-                                                            method="POST" class="delete-form" id="videoDeleteForm">
+                                                            method="POST" class="delete-form" id="videoDeleteForm{{ $video->id }}">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm deleteButton"
-                                                                data-id="video-{{ $video->id }}"><i
-                                                                    class="icon-base ti tabler-trash me-2"></i>
-                                                                Hapus</button>
+                                                                data-id="video-{{ $video->id }}"
+                                                                data-name="{{ $video->name }}">
+                                                                <i class="icon-base ti tabler-trash me-2"></i>
+                                                                Hapus
+                                                            </button>
                                                         </form>
                                                     </td>
                                                 </tr>
+
+                                                <!-- Video Preview Modal -->
+                                                @if ($video->path)
+                                                    <div class="modal fade" id="videoPreviewModal{{ $video->id }}" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Preview: {{ $video->name }}</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                </div>
+                                                                <div class="modal-body text-center">
+                                                                    <video width="100%" height="400" controls>
+                                                                        <source src="{{ Storage::url($video->path) }}" type="video/mp4">
+                                                                        <source src="{{ Storage::url($video->path) }}" type="video/webm">
+                                                                        <source src="{{ Storage::url($video->path) }}" type="video/ogg">
+                                                                        Your browser does not support the video tag.
+                                                                    </video>
+
+                                                                    <!-- Video Details -->
+                                                                    <div class="mt-3 text-start">
+                                                                        <h6>Detail Video:</h6>
+                                                                        <ul class="list-unstyled">
+                                                                            <li><strong>Nama:</strong> {{ $video->name }}</li>
+                                                                            <li><strong>Format:</strong> {{ strtoupper(pathinfo($video->path, PATHINFO_EXTENSION)) }}</li>
+                                                                            @if(Storage::disk('public')->exists($video->path))
+                                                                                <li><strong>Ukuran:</strong> {{ number_format(Storage::disk('public')->size($video->path) / 1024 / 1024, 2) }} MB</li>
+                                                                            @endif
+                                                                            <li><strong>Tanggal Upload:</strong> {{ $video->created_at->format('d M Y H:i') }}</li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <a href="{{ Storage::url($video->path) }}"
+                                                                       class="btn btn-success" target="_blank" download>
+                                                                        <i class="ti ti-download me-1"></i> Download
+                                                                    </a>
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                        Tutup
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         @else
                                             <tr>
                                                 <td colspan="3" class="text-center"> Belum ada Data</td>
                                             </tr>
-
                                         @endif
                                     </tbody>
                                 </table>
@@ -114,27 +168,56 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if (!$videos->isEmpty())
+                                        @if (!$images->isEmpty())
                                             @foreach ($images as $image)
                                                 <tr>
                                                     <td>{{ $image->name }}</td>
                                                     <td>
                                                         <img src="{{ Storage::url($image->path) }}"
-                                                            alt="Gambar {{ $image->name }}" height="150px" />
+                                                            alt="Gambar {{ $image->name }}" height="150px"
+                                                            style="border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" />
                                                     </td>
                                                     <td>
                                                         <form action="{{ route('gallery.destroy', $image->id) }}"
-                                                            method="POST" class="delete-form" id="imageDeleteForm">
+                                                            method="POST" class="delete-form" id="imageDeleteForm{{ $image->id }}">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm deleteButton"
-                                                                data-id="image-{{ $image->id }}"><i
-                                                                    class="icon-base ti tabler-trash me-2"></i>
-                                                                Hapus</button>
+                                                                data-id="image-{{ $image->id }}"
+                                                                data-name="{{ $image->name }}">
+                                                                <i class="icon-base ti tabler-trash me-2"></i>
+                                                                Hapus
+                                                            </button>
                                                         </form>
                                                     </td>
                                                 </tr>
+
+                                                <!-- Image Preview Modal -->
+                                                <div class="modal fade" id="imagePreviewModal{{ $image->id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Preview: {{ $image->name }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body text-center">
+                                                                <img src="{{ Storage::url($image->path) }}"
+                                                                     alt="{{ $image->name }}" class="img-fluid"
+                                                                     style="max-height: 500px; border-radius: 8px;">
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <a href="{{ Storage::url($image->path) }}"
+                                                                   class="btn btn-success" target="_blank" download>
+                                                                    <i class="ti ti-download me-1"></i> Download
+                                                                </a>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                    Tutup
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endforeach
                                         @else
                                             <tr>
@@ -145,8 +228,6 @@
                                 </table>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>
@@ -172,7 +253,7 @@
                 text: '{{ session('success') }}',
                 confirmButtonText: 'OK',
                 showConfirmButton: true,
-                timer: 2500, // The alert will automatically close after 3 seconds
+                timer: 2500,
             });
         </script>
     @elseif(session('error'))
@@ -183,16 +264,14 @@
                 text: '{{ session('error') }}',
                 confirmButtonText: 'OK',
                 showConfirmButton: true,
-                timer: 2500, // The alert will automatically close after 3 seconds
+                timer: 2500,
             });
         </script>
     @endif
 @endsection
 
 @section('css')
-
     <style>
-        /* Add this CSS inside your styles */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -216,13 +295,8 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 @endsection
@@ -232,22 +306,14 @@
     <script>
         document.querySelectorAll('.deleteButton').forEach(button => {
             button.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent the form from submitting immediately
+                e.preventDefault();
 
-                const itemId = this.getAttribute('data-id'); // Get the item ID (video or image)
-
-                let itemName = "";
-                if (itemId.includes('video')) {
-                    // If it's a video, get the video name
-                    itemName = "{{ $video->name ?? '' }}";
-                } else {
-                    // If it's an image, get the image name
-                    itemName = "{{ $image->name ?? '' }}";
-                }
+                const itemId = this.getAttribute('data-id');
+                const itemName = this.getAttribute('data-name');
 
                 Swal.fire({
                     title: 'Hapus Gallery',
-                    text: `Yakin ingin menghapus  "${itemName}"?`,
+                    text: `Yakin ingin menghapus "${itemName}"?`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -256,18 +322,16 @@
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Submit the respective form based on the item type
+                        // Get the form by ID and submit it
+                        const videoId = itemId.split('-')[1];
                         if (itemId.includes('video')) {
-                            document.getElementById('videoDeleteForm')
-                                .submit(); // Submit video form
+                            document.getElementById(`videoDeleteForm${videoId}`).submit();
                         } else {
-                            document.getElementById('imageDeleteForm')
-                                .submit(); // Submit image form
+                            document.getElementById(`imageDeleteForm${videoId}`).submit();
                         }
                     }
                 });
             });
         });
     </script>
-
 @endsection

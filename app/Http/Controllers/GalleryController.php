@@ -24,11 +24,11 @@ class GalleryController extends Controller
         $imageCount = Gallery::where('type', 'like', 'gambar%')->count(); // Count images
         $videoCount = Gallery::where('type', 'like', 'video%')->count(); // Count videos
 
-        $images=Gallery::where('type', 'like', 'gambar%')->get();
-        $videos=Gallery::where('type', 'like', 'video%')->get();
+        $images = Gallery::where('type', 'like', 'gambar%')->get();
+        $videos = Gallery::where('type', 'like', 'video%')->get();
 
         // Pass the data to the view
-        return view('dashboard.gallery.gallery', compact('galleries', 'galleryCount', 'imageCount', 'videoCount','images','videos'));
+        return view('dashboard.gallery.gallery', compact('galleries', 'galleryCount', 'imageCount', 'videoCount', 'images', 'videos'));
     }
 
     /**
@@ -41,53 +41,80 @@ class GalleryController extends Controller
      */
     public function store(Request $request)
     {
-
-
         // Validate the request data
-        $request->validate([
+        $validationRules = [
             'name' => 'required|string|max:255', // Title of the video or image
+            'type' => 'required|in:video,gambar', // Must be either 'video' or 'gambar'
+        ];
 
-        ]);
-
-        // Handle video URL or image file upload
+        // Add specific validation based on type
         if ($request->type == 'video') {
-            // Store video (YouTube URL or similar)
-            $videoUrl = $request->path; // Store the URL as is
-            $filePath = null;
+            $validationRules['video_file'] = 'required|file|mimes:mp4,avi,mov,wmv,flv,mkv,webm,m4v|max:102400'; // Max 100MB
+        } elseif ($request->type == 'gambar') {
+            $validationRules['path'] = 'required|file|mimes:jpeg,png,jpg,gif,svg,webp|max:10240'; // Max 10MB
+        }
+
+        $request->validate($validationRules);
+
+        $filePath = null;
+
+        // Handle video file or image file upload
+        if ($request->type == 'video') {
+            // Handle video file upload
+            if ($request->hasFile('video_file')) {
+                $video = $request->file('video_file');
+
+                // Get the current date to add to the file name
+                $currentDate = Carbon::now()->format('Y-m-d_H-i-s'); // Format: YYYY-MM-DD_HH-MM-SS
+
+                // Generate the new file name using the title and the current date
+                $newFileName = strtolower(str_replace(' ', '_', $request->name)) . '_' . $currentDate . '.' . $video->getClientOriginalExtension();
+
+                // Store the video with the new name
+                $filePath = $video->storeAs('Gallery/Videos', $newFileName, 'public'); // Save in the 'Gallery/Videos' directory
+            } else {
+                return back()->with('error', 'No video file uploaded.');
+            }
         } elseif ($request->type == 'gambar') {
             // Handle image upload
             if ($request->hasFile('path')) {
                 $image = $request->file('path');
 
                 // Get the current date to add to the file name
-                $currentDate = Carbon::now()->format('Y-m-d'); // Format: YYYY-MM-DD_HH-MM-SS
+                $currentDate = Carbon::now()->format('Y-m-d_H-i-s'); // Format: YYYY-MM-DD_HH-MM-SS (updated to match video format)
 
                 // Generate the new file name using the title and the current date
                 $newFileName = strtolower(str_replace(' ', '_', $request->name)) . '_' . $currentDate . '.' . $image->getClientOriginalExtension();
 
                 // Store the image with the new name
-                $filePath = $image->storeAs('Gallery', $newFileName, 'public'); // Save in the 'Gallery' directory
-
+                $filePath = $image->storeAs('Gallery/Images', $newFileName, 'public'); // Save in the 'Gallery/Images' directory
             } else {
                 return back()->with('error', 'No image uploaded.');
             }
-
-
-            $videoUrl = null; // Set video URL to null as we are dealing with an image
         }
 
         // Save the data in the database
-        Gallery::create([
-            'name' => $request->name, // Video title or image name
-            'type' => $request->type, // Either 'video' or 'image'
-            'path' => $videoUrl ?? $filePath, // Store either video URL or image path
-        ]);
+        try {
+            Gallery::create([
+                'name' => $request->name, // Video title or image name
+                'type' => $request->type, // Either 'video' or 'gambar'
+                'path' => $filePath, // Store file path for both video and image
+                'description' => $request->description ?? null, // Optional description field
+            ]);
 
-        // Return success with a redirect
-        if ($request->type == 'video'){
-            return redirect()->route('gallery')->with('success', 'Video Berhasil Ditambahkan');
-        }else{
-            return redirect()->route('gallery')->with('success', 'Gambar Berhasil Ditambahkan');
+            // Return success with a redirect
+            if ($request->type == 'video') {
+                return redirect()->route('gallery')->with('success', 'Video Berhasil Ditambahkan');
+            } else {
+                return redirect()->route('gallery')->with('success', 'Gambar Berhasil Ditambahkan');
+            }
+        } catch (\Exception $e) {
+            // If database save fails, delete the uploaded file to prevent orphaned files
+            if ($filePath && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
         }
     }
 
