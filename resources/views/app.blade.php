@@ -38,6 +38,7 @@
 
 <body class="bg-gray-50 font-sans antialiased" x-data="{ sidebarOpen: false, darkMode: false }" :class="{ 'dark': darkMode }" x-cloak>
     @include('components.header')
+    @include('partials.icon')
     @yield('content')
 
     <!-- Tombol untuk Scroll Up -->
