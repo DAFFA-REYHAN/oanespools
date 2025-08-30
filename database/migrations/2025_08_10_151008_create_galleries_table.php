@@ -14,7 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->string('name'); // Name of the file (image/video)
             $table->string('type'); // Type of file (e.g., image, video)
-            $table->string('path'); // Path to the uploaded file
+            $table->string('path')->nullable(); // Path to the uploaded file
+            $table->string('thumbnail')->nullable(); // Path to the uploaded file
             $table->timestamps();
         });
     }
