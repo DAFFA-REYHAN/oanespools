@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "@fancyapps/ui/dist/fancybox/fancybox.css";
+@tailwind components;
+@tailwind utilities;
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -26,4 +28,74 @@
 
 html {
     font-family: var(--font-sans);
+}
+
+/* Video Slider Optimizations */
+.video-swiper {
+    width: 100%;
+    height: 100%;
+}
+
+.video-swiper .swiper-slide {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Aspect Ratio Helper */
+.aspect-video {
+    position: relative;
+    padding-bottom: 56.25%;
+    /* 16:9 */
+}
+
+.aspect-video>* {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Performance Optimizations */
+.swiper-slide video {
+    will-change: transform;
+}
+
+/* Custom Pagination Bullets */
+.video-pagination .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+}
+
+.video-pagination .swiper-pagination-bullet-active {
+    background: white;
+    width: 30px;
+    border-radius: 5px;
+}
+
+/* Smooth Transitions */
+.swiper-button-next,
+.swiper-button-prev {
+    transition: all 0.3s ease;
+}
+
+/* Loading State */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.video-loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

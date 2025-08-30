@@ -347,82 +347,53 @@
                 </p>
             </div>
 
-            {{-- =================== VIDEO SLIDER =================== --}}
+            {{-- =================== OPTIMIZED VIDEO SLIDER =================== --}}
             @if ($videoItems->isNotEmpty())
-                <div class="relative mb-10 rounded-2xl overflow-hidden max-h-[500px] max-w-[1000px] mx-auto">
-                    <div class="mySwiper  max-h-[500px] max-w-[1000px]">
+                <div class="relative mb-10 rounded-2xl overflow-hidden max-w-6xl mx-auto">
+                    <!-- Video Slider Container -->
+                    <div class="video-swiper swiper">
                         <div class="swiper-wrapper">
-                            @foreach ($videoItems as $it)
-                                <div class="swiper-slide  max-h-[200] sm:max-h-[200] lg:max-h-[500px] max-w-[1000px]">
-                                    <!-- Link ke Fancybox untuk membuka video di modal -->
-                                    <a data-fancybox="videos" href="#video-{{ $it->id }}"
-                                        data-caption="<h6 class='text-center'>{{ $it->name ?? 'Video' }}</h6>  <p class='text-center'>{{ $it->created_at->format('d M Y H:i') }}</p>"
-                                        class="block relative rounded-2xl cursor-pointer group">
-                                        <div
-                                            class="relative pt-[56.25%] max-h-[500px] max-w-[1000px] rounded-2xl overflow-hidden bg-black">
-                                            <!-- Video placeholder (thumbnail bisa diganti dengan poster hitam jika tidak ada thumbnail) -->
-                                            <video class="absolute inset-0 w-full h-full object-cover" preload="metadata">
-                                                <source src="{{ Storage::url($it->path) }}" type="video/mp4">
-                                                <source src="{{ Storage::url($it->path) }}" type="video/webm">
-                                                <source src="{{ Storage::url($it->path) }}" type="video/ogg">
-                                                Your browser does not support the video tag.
-                                            </video>
-
-                                            <!-- Play Button Overlay -->
-                                            <div class="absolute inset-0 flex items-center justify-center group">
-                                                <button
-                                                    class="bg-white/80 rounded-full p-4 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                    <svg class="w-8 h-8 text-black" viewBox="0 0 20 20"
-                                                        fill="currentColor">
-                                                        <path fill-rule="evenodd"
-                                                            d="M6.5 5.5a1 1 0 011.538-.843l6 4a1 1 0 010 1.686l-6 4A1 1 0 016.5 13.5v-8z"
-                                                            clip-rule="evenodd" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </a>
-
-                                    <!-- Hidden video element for Fancybox -->
-                                    <div id="video-{{ $it->id }}" style="display: none; max-width: 900px;">
-                                        <video width="100%" height="auto" controls autoplay
-                                            style="max-height:70vh; border-radius:8px;">
-                                            <source src="{{ Storage::url($it->path) }}" type="video/mp4">
-                                            <source src="{{ Storage::url($it->path) }}" type="video/webm">
-                                            <source src="{{ Storage::url($it->path) }}" type="video/ogg">
-                                            Your browser does not support the video tag.
+                            @foreach ($videoItems as $index => $video)
+                                <div class="swiper-slide">
+                                    <div class="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden">
+                                        <!-- Video Element -->
+                                        <video class="absolute inset-0 w-full h-full object-cover"
+                                            poster="{{ Storage::url($video->thumbnail) ?? asset('img/video-placeholder.jpg') }}"
+                                            preload="metadata" muted playsinline
+                                            data-src="{{ Storage::url($video->path) }}">
                                         </video>
+
+                                        <!-- Play Button Overlay -->
+                                        <a href="{{ Storage::url($video->path) }}" data-fancybox="videos"
+                                            data-caption="{{ $video->name ?? 'Video' }}"
+                                            class="absolute inset-0 flex items-center justify-center cursor-pointer group">
+                                            <div
+                                                class="bg-white/90 rounded-full p-4 sm:p-5 shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:bg-white">
+                                                <svg class="w-8 h-8 sm:w-10 sm:h-10 text-gray-900" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path
+                                                        d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                                                </svg>
+                                            </div>
+                                        </a>
 
                                     </div>
                                 </div>
                             @endforeach
                         </div>
 
-                        <!-- Swiper Pagination & Navigation -->
+                        <!-- Navigation -->
                         @if ($videoItems->count() > 1)
                             <div
-                                class="swiper-button-next !text-white !bg-black/50 !rounded-full !w-10 !h-10 after:!text-sm">
+                                class="video-button-next swiper-button-next !text-white !bg-black/50 hover:!bg-black/70 !rounded-full !w-12 !h-12 after:!text-sm">
                             </div>
                             <div
-                                class="swiper-button-prev !text-white !bg-black/50 !rounded-full !w-10 !h-10 after:!text-sm">
+                                class="video-button-prev swiper-button-prev !text-white !bg-black/50 hover:!bg-black/70 !rounded-full !w-12 !h-12 after:!text-sm">
                             </div>
-                            <div class="swiper-pagination !bottom-4"></div>
+                            <div class="video-pagination swiper-pagination !bottom-4"></div>
                         @endif
                     </div>
                 </div>
-
-                <!-- Swiper Init -->
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-
-
-                        // Fancybox Init for videos
-                        Fancybox.bind("[data-fancybox='videos']", {
-                            infinite: true,
-                            hideScrollbar: true,
-                        });
-                    });
-                </script>
             @else
                 <p class="text-center text-gray-500 mb-10">📹 Data video belum ada</p>
             @endif

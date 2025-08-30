@@ -50,6 +50,7 @@ class GalleryController extends Controller
         // Add specific validation based on type
         if ($request->type == 'video') {
             $validationRules['video_file'] = 'required|file|mimes:mp4,avi,mov,wmv,flv,mkv,webm,m4v|max:102400'; // Max 100MB
+            $validationRules['thumbnail_data'] = 'required|string'; // Base64 thumbnail data
         } elseif ($request->type == 'gambar') {
             $validationRules['path'] = 'required|file|mimes:jpeg,png,jpg,gif,svg,webp|max:10240'; // Max 10MB
         }
@@ -57,6 +58,7 @@ class GalleryController extends Controller
         $request->validate($validationRules);
 
         $filePath = null;
+        $thumbnailPath = null;
 
         // Handle video file or image file upload
         if ($request->type == 'video') {
@@ -68,10 +70,31 @@ class GalleryController extends Controller
                 $currentDate = Carbon::now()->format('Y-m-d_H-i-s'); // Format: YYYY-MM-DD_HH-MM-SS
 
                 // Generate the new file name using the title and the current date
-                $newFileName = strtolower(str_replace(' ', '_', $request->name)) . '_' . $currentDate . '.' . $video->getClientOriginalExtension();
+                $baseFileName = strtolower(str_replace(' ', '_', $request->name)) . '_' . $currentDate;
+                $videoFileName = $baseFileName . '.' . $video->getClientOriginalExtension();
+                $thumbnailFileName = $baseFileName . '_thumbnail.jpg'; // Always JPG for thumbnail
 
-                // Store the video with the new name
-                $filePath = $video->storeAs('Gallery/Videos', $newFileName, 'public'); // Save in the 'Gallery/Videos' directory
+                // Store the video with the new name in Gallery/Videos directory
+                $filePath = $video->storeAs('Gallery/Videos', $videoFileName, 'public');
+
+                // Process thumbnail from base64 data
+                $thumbnailData = $request->input('thumbnail_data');
+                if ($thumbnailData) {
+                    try {
+                        // Remove data:image/jpeg;base64, prefix
+                        $thumbnailBase64 = preg_replace('#^data:image/[^;]+;base64,#', '', $thumbnailData);
+                        $thumbnailBinary = base64_decode($thumbnailBase64);
+
+                        if ($thumbnailBinary) {
+                            // Save thumbnail in same Gallery/Videos directory as video
+                            $thumbnailPath = 'Gallery/Videos/' . $thumbnailFileName;
+                            Storage::disk('public')->put($thumbnailPath, $thumbnailBinary);
+                        }
+                    } catch (\Exception $e) {
+                        // If thumbnail fails, continue without it
+                        $thumbnailPath = null;
+                    }
+                }
             } else {
                 return back()->with('error', 'No video file uploaded.');
             }
@@ -81,7 +104,7 @@ class GalleryController extends Controller
                 $image = $request->file('path');
 
                 // Get the current date to add to the file name
-                $currentDate = Carbon::now()->format('Y-m-d_H-i-s'); // Format: YYYY-MM-DD_HH-MM-SS (updated to match video format)
+                $currentDate = Carbon::now()->format('Y-m-d_H-i-s'); // Format: YYYY-MM-DD_HH-MM-SS
 
                 // Generate the new file name using the title and the current date
                 $newFileName = strtolower(str_replace(' ', '_', $request->name)) . '_' . $currentDate . '.' . $image->getClientOriginalExtension();
@@ -95,23 +118,32 @@ class GalleryController extends Controller
 
         // Save the data in the database
         try {
-            Gallery::create([
+            $galleryData = [
                 'name' => $request->name, // Video title or image name
                 'type' => $request->type, // Either 'video' or 'gambar'
                 'path' => $filePath, // Store file path for both video and image
-                'description' => $request->description ?? null, // Optional description field
-            ]);
+            ];
+
+            // Add thumbnail field for video only
+            if ($request->type == 'video') {
+                $galleryData['thumbnail'] = $thumbnailPath; // Thumbnail file path
+            }
+
+            Gallery::create($galleryData);
 
             // Return success with a redirect
             if ($request->type == 'video') {
-                return redirect()->route('gallery')->with('success', 'Video Berhasil Ditambahkan');
+                return redirect()->route('gallery')->with('success', 'Video Berhasil Ditambahkan dengan Thumbnail!');
             } else {
                 return redirect()->route('gallery')->with('success', 'Gambar Berhasil Ditambahkan');
             }
         } catch (\Exception $e) {
-            // If database save fails, delete the uploaded file to prevent orphaned files
+            // If database save fails, delete the uploaded files to prevent orphaned files
             if ($filePath && Storage::disk('public')->exists($filePath)) {
                 Storage::disk('public')->delete($filePath);
+            }
+            if ($thumbnailPath && Storage::disk('public')->exists($thumbnailPath)) {
+                Storage::disk('public')->delete($thumbnailPath);
             }
 
             return back()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
